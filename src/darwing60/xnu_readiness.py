@@ -19,7 +19,6 @@ EXPECTED_TAG = "xnu-11215.1.10"
 EXPECTED_TAG_OBJECT = "d95cbeef34d1a9cca097b33d385db3b2aae1a755"
 SOURCE_TREE = XNU_ROOT / "upstream"
 SOURCE_SENTINELS = ("README.md", "osfmk", "bsd", "iokit", "APPLE_LICENSE")
-BUILD_RECORD = SOURCE_TREE / "DARWING60-BUILD-VERIFICATION.txt"
 
 
 class XNUReadinessError(ValueError):
@@ -98,11 +97,12 @@ def audit_xnu_readiness(
 
     # A build is only counted when a human-reviewed verification record exists.
     # The checker deliberately does not infer success from binaries or log files.
-    build_record_present = BUILD_RECORD.is_file()
+    build_record = source_root / "DARWING60-BUILD-VERIFICATION.txt"
+    build_record_present = build_record.is_file()
     build_verified = False
     if build_record_present:
         try:
-            record_text = BUILD_RECORD.read_text(encoding="utf-8")
+            record_text = build_record.read_text(encoding="utf-8")
         except OSError:
             record_text = ""
         build_verified = (
@@ -148,7 +148,7 @@ def audit_xnu_readiness(
         },
         "build_verification": {
             "status": "verified" if build_verified else "not_verified",
-            "record_path": str(BUILD_RECORD),
+            "record_path": str(build_record),
             "note": (
                 "A reviewed build record is required; the audit never compiles XNU."
             ),
