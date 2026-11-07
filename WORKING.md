@@ -183,7 +183,7 @@ See [driver framework design](docs/architecture/driver-framework.md).
 | Normalized multi-touch event model | Host prototype | Validates and converts synthetic events |
 | Rotation-aware coordinate conversion | Host prototype | Logical coordinates only |
 | Moto G60 panel identification | Research | Kernel DTS supports 1080×2460 Tianma/ILI7807S configuration; exact module SKU unconfirmed |
-| Moto G60 touch-controller identification | Research | DTS says ILITEK over SPI; exact IC unknown and Android NVT-ts path conflicts |
+| Moto G60 touch-controller identification | Research | Kernel DTS says ILITEK over SPI; Android gesture code uses an NVT-labelled sysfs path, which does not independently identify the IC |
 | Physical display/touch driver | Not implemented | Requires verified hardware and kernel interfaces |
 
 See [display/touch prototype](docs/architecture/display-touch-prototype.md).
