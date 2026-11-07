@@ -133,3 +133,18 @@ See [profile generator documentation](docs/porting/profile-generator.md).
 | Kernel and graphics readiness | Host prototype | Does not test or boot a kernel |
 
 See [hardware readiness documentation](docs/porting/hardware-readiness.md).
+
+## Driver architecture registry
+
+| Feature | Status | Notes |
+|---|---|---|
+| Seven-category driver registry | Host prototype | Metadata catalogue and validator only |
+| Display and touchscreen driver | Planned | No functional device driver |
+| GPU driver | Planned | No graphics acceleration implementation |
+| Wi-Fi and Bluetooth drivers | Planned | No wireless drivers |
+| Battery and charging driver | Planned | No battery telemetry implementation |
+| Audio driver | Planned | No audio implementation |
+| Sensor drivers | Planned | No sensor integration |
+| Storage driver | Planned | No device storage integration |
+
+See [driver registry documentation](docs/architecture/driver-registry.md).
