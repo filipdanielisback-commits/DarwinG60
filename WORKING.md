@@ -108,3 +108,14 @@ See [porting overview](docs/porting/README.md) and
 | Second device profile | Planned | No additional device is validated |
 
 See [compatibility database documentation](docs/porting/compatibility-database.md).
+
+
+## Device profile generator
+
+| Feature | Status | Notes |
+|---|---|---|
+| Starter profile generator | Host prototype | Creates four metadata/documentation files |
+| Unknown-value protection | Host prototype | Hardware specifications start unknown |
+| Existing-profile overwrite protection | Host prototype | Generator refuses existing codename directories |
+
+See [profile generator documentation](docs/porting/profile-generator.md).
