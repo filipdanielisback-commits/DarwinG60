@@ -1,0 +1,19 @@
+{
+  "description": "Synthetic example for testing only; not a Moto G60 memory map.",
+  "address_space": "illustrative",
+  "regions": [
+    {
+      "name": "example-firmware-area",
+      "start": 4096,
+      "size": 4096,
+      "purpose": "Demonstration range only"
+    },
+    {
+      "name": "example-kernel-area",
+      "start": 12288,
+      "size": 8192,
+      "purpose": "Demonstration range only"
+    }
+  ],
+  "hardware_validated": false
+}
