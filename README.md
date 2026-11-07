@@ -174,3 +174,13 @@ Run `python tools/hardware_readiness.py hanoip` to summarize six areas of
 device research and implementation gaps. See
 [hardware readiness documentation](docs/porting/hardware-readiness.md).
 The report reads repository metadata only and does not test hardware.
+
+## Driver architecture registry
+
+DarwinG60 now tracks seven planned driver areas for each device: display and
+touchscreen, GPU, Wi-Fi and Bluetooth, battery and charging, audio, sensors,
+and storage. Inspect the Moto G60 registry with
+`python tools/driver_registry.py show hanoip` and validate it with
+`python tools/driver_registry.py check hanoip`. See
+[driver registry documentation](docs/architecture/driver-registry.md).
+These are planning records, not working drivers or verified hardware support.
