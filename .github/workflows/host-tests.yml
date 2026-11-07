@@ -96,19 +96,17 @@ jobs:
           print("ci_driverkit_header_export=skipped_for_generic_kernel_build")
           PY
           echo "driverkit_export=omitted_from_generic_kernel_header_export_only" >> "$evidence/kernel-build-status.txt"
-          # XNU's documented invocation runs exporthdrs and all in the
-          # same make process so the generated export tree is shared.
-          # Apple documents a matching KDK as required for external ARM64
-          # builds; do not attempt a misleading partial compile without it.
-          if [ -z "$KDK_ROOT" ]; then
-            echo "build_blocked=matching_apple_kdk_required_for_external_arm64_build" >> "$evidence/kernel-build-status.txt"
-            echo "No matching Apple KDK is installed. XNU's external Apple-silicon build instructions require the exact host-matched KDK." | tee "$evidence/kernel-build.log"
-            status=2
-          else
-            set +e
+          # Keep exporthdrs and all in one make process so generated headers
+          # remain available to dependent targets. Attempt the build with the
+          # public SDK even when no KDK is installed; record that condition
+          # rather than treating an unverified prerequisite as a hard stop.
+          set +e
+          if [ -n "$KDK_ROOT" ]; then
             make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j2 exporthdrs all > "$evidence/kernel-build.log" 2>&1
-            status=$?
+          else
+            make SDKROOT="$SDKROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j2 exporthdrs all > "$evidence/kernel-build.log" 2>&1
           fi
+          status=$?
           set -e
           echo "make_exit_code=$status" >> "$evidence/kernel-build-status.txt"
           artifact="$(find BUILD -type f -name 'kernel.development*' -size +0c -print -quit 2>/dev/null || true)"
