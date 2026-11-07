@@ -57,3 +57,12 @@ Consult the license and notices for the exact upstream release before redistribu
 ## Source inventory
 
 See [UPSTREAM-SOURCES.md](UPSTREAM-SOURCES.md) for the official Apple source repositories reviewed so far, including XNU, dyld, WebKit and the iOS distribution manifest. The inventory distinguishes selected open-source components from the complete proprietary iOS 18 operating system.
+
+
+## Pinned research baseline
+
+The project has selected the official Apple XNU tag `xnu-11215.1.10` as an **iOS 18-era research baseline**. The exact tag object is recorded in [UPSTREAM.lock](UPSTREAM.lock). The tag is pinned for repeatable source review; this does not establish an exact iOS 18 point-release mapping or hanoip compatibility.
+
+The upstream Apple Public Source License 2.0 text is preserved in [APPLE_LICENSE](APPLE_LICENSE). Review and retain the applicable upstream notices for any source files before redistribution.
+
+**Import/build status:** only the license and source pin are committed here. The full upstream source archive has not been copied into this repository, and no XNU binary has been built. The available GitHub file-writing workflow cannot execute the required Apple build environment or import the entire upstream tree as a Git submodule. Do not mistake the pin for a vendored source tree.
