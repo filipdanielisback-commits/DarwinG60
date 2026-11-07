@@ -119,3 +119,17 @@ See [compatibility database documentation](docs/porting/compatibility-database.m
 | Existing-profile overwrite protection | Host prototype | Generator refuses existing codename directories |
 
 See [profile generator documentation](docs/porting/profile-generator.md).
+
+
+## Six-area hardware readiness assessment
+
+| Area | Status | Notes |
+|---|---|---|
+| CPU and platform research | Host prototype | Summarizes device profile evidence |
+| Boot and firmware research | Host prototype | Reports unknowns; does not validate boot firmware |
+| Display and GPU | Host prototype | Tracks documentation and implementation gaps |
+| Wi-Fi and Bluetooth | Host prototype | Reports driver implementation status |
+| Battery and power management | Host prototype | Tracks missing power support evidence |
+| Kernel and graphics readiness | Host prototype | Does not test or boot a kernel |
+
+See [hardware readiness documentation](docs/porting/hardware-readiness.md).
