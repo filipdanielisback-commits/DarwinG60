@@ -108,3 +108,26 @@ Some public sources disagree on display dimensions/resolution (1080 × 2460 vers
 ## Driver implementation boundary
 
 This dossier does not authorize or describe device flashing, bootloader changes, partition writes, firmware replacement, or physical-device modification. Initial implementation work should remain host-side: metadata parsers, interface specifications, mock devices, and tests. A real hardware driver requires a real kernel/platform foundation, verified interfaces, suitable licensing, and a safe, documented validation environment.
+
+## Display/touch follow-up (2026-11-07)
+
+A fresh public-source review confirms that the community hanoip Android tree
+contains a `lineagehw/touch` integration directory. This is evidence of
+Android-side touch integration, not proof of a physical controller identity
+or a DarwinG60 driver. The moto-hanoip GitHub organization is marked archived
+by its administrator (March 23, 2024).
+
+The resolution conflict remains unresolved: the community device tree lists
+1080 × 2460, while the TeamWin TWRP tree lists 1080 × 2400. The exact panel
+part number, revision, DSI timings, touch-controller part number, bus address,
+interrupt/reset wiring and firmware requirements have not been verified.
+
+Sources:
+- [Community hanoip device tree](https://github.com/bhawesh2002/android_device_motorola_hanoip)
+- [TeamWin hanoip device tree](https://github.com/TeamWin/android_device_motorola_hanoip)
+- [Archived moto-hanoip organization](https://github.com/moto-hanoip/)
+- [Linux common touchscreen binding](https://android.googlesource.com/kernel/common/+/02d6eeedbc36d4b309d5518778071a749ef79c4e/Documentation/devicetree/bindings/input/touchscreen/touchscreen.yaml)
+
+A synthetic host-side interface prototype now exists at
+`src/darwing60/display_touch.py`. Its 800 × 600 fixture is invented test data,
+not a proposed Moto G60 mode or panel configuration.
