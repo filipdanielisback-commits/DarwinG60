@@ -73,6 +73,22 @@ test -f "$SDKROOT/usr/local/include/os/atomic_private.h"
 echo "xnu_private_atomic_headers=staged" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "xnu_full_installhdrs=blocked_by_DriverKit_IOTypes.h_source_rule" >> "$EVIDENCE/dependency-prepare-status.txt"
 
+# Build the kernel firehose library from the release-manifest-pinned libdispatch.
+DISPATCH_DST="$WORK/libdispatch-dst"
+xcodebuild -project "$DISPATCH/libdispatch.xcodeproj" \
+  -target libfirehose_kernel -configuration Release -sdk macosx \
+  ARCHS="arm64 arm64e" VALID_ARCHS="arm64 arm64e" \
+  PRODUCT_NAME=firehose_kernel DSTROOT="$DISPATCH_DST" install \
+  2>&1 | tee "$EVIDENCE/libdispatch-build.log"
+if [[ ! -d "$DISPATCH_DST/usr/local" ]]; then
+  echo "libdispatch build did not stage usr/local" >&2
+  exit 1
+fi
+sudo mkdir -p "$SDKROOT/usr/local"
+sudo ditto "$DISPATCH_DST/usr/local" "$SDKROOT/usr/local"
+echo "availabilityversions=installed" >> "$EVIDENCE/dependency-prepare-status.txt"
+echo "libdispatch=installed" >> "$EVIDENCE/dependency-prepare-status.txt"
+
 # KDK must match the exact host macOS version/build. Never guess its name.
 HOST_VERSION="$(sw_vers -productVersion)"
 HOST_BUILD="$(sw_vers -buildVersion)"
