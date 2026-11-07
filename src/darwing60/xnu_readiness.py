@@ -111,7 +111,7 @@ def audit_xnu_readiness(
     build_record = xnu_root / "build-verification.json"
     if build_record.is_file():
         try:
-            record = json.loads(BUILD_RECORD.read_text(encoding="utf-8"))
+            record = json.loads(build_record.read_text(encoding="utf-8"))
             required_fields = (
                 "result", "tag", "tag_object", "source_commit", "build_host",
                 "sdk", "command", "artifact", "artifact_sha256", "log",
