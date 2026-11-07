@@ -76,3 +76,25 @@ project. Status labels describe implementation evidence, not ambition.
 
 DarwinG60 is an independent open-source research project. It is not a port of
 complete iOS and does not contain Apple's proprietary frameworks or drivers.
+
+
+## Porting to Another Device
+
+The primary target remains Moto G60 / `hanoip`. Additional devices require
+their own reviewed profile, boot-architecture research, driver feasibility
+assessment, and validation plan. No second device is currently supported.
+
+| Porting area | Status | Notes |
+|---|---|---|
+| Device inventory command | Host prototype | Reads repository metadata only |
+| Device-specific profiles | In development | Current profile is hanoip |
+| Boot architecture research | Planned | Verify each device; UEFI is not universal |
+| UEFI/firmware compatibility assessment | Planned | No generic UEFI loader assumed |
+| Kernel portability | Planned | Requires a real kernel architecture |
+| Per-device driver matrix | Planned | Display, touch, storage, Wi-Fi, battery, audio, sensors, GPU |
+| Per-device graphical integration | Planned | Depends on core services and drivers |
+| Hardware validation | Planned | No additional device is currently validated |
+
+See [porting overview](docs/porting/README.md) and
+[host-side command reference](docs/porting/commands.md).
+
