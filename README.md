@@ -143,3 +143,11 @@ See [system information documentation](docs/system-information.md).
 See [WORKING.md](WORKING.md) for the public feature tracker, including planned Wi-Fi, battery reporting, graphical interface, status bar, Control Center, kernel, and Moto G60 hardware support. The current kernel catalogue and service registry are host-side architecture prototypes only; they are not a running kernel or hardware services.
 
 Core design notes: [kernel subsystem architecture](docs/architecture/core-subsystems.md) and [service architecture](docs/services.md).
+
+## Porting to other devices
+
+DarwinG60 has a documented [multi-device porting plan](docs/porting/README.md)
+and [host-side porting commands](docs/porting/commands.md). The Moto G60 remains
+the primary target. Every additional device needs its own hardware research and
+compatibility assessment; UEFI must not be assumed to exist on every Android
+device. See [WORKING.md](WORKING.md) for the porting tracker.
