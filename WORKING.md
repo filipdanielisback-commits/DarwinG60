@@ -198,3 +198,14 @@ See [display/touch prototype](docs/architecture/display-touch-prototype.md).
 | Touch-controller physical identity | Unresolved | ILITEK kernel binding and NVT-labelled Android gesture interface remain unreconciled |
 
 See [hardware evidence ledger documentation](docs/porting/hardware-evidence-ledger.md).
+
+
+## Display/touch profile integration
+
+| Feature | Status | Notes |
+|---|---|---|
+| Synthetic display profile loader | Host prototype | Loads the synthetic fixture into the metadata-only display subsystem |
+| Hardware evidence attachment | Host prototype | Displays source observations without promoting uncertain identities |
+| Touch controller and LCD module identity | Unresolved | Physical component identities remain unverified |
+
+See [display/touch profile integration](docs/architecture/display-touch-profile-integration.md).
