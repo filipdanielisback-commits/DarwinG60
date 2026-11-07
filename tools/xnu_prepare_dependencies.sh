@@ -80,8 +80,26 @@ sudo cp "$ROOT/kernel/xnu/upstream/osfmk/machine/cpu_capabilities.h" "$KERNEL_PR
 sudo cp "$ROOT/kernel/xnu/upstream/osfmk/arm/cpu_capabilities.h" "$KERNEL_PRIVATE/arm/cpu_capabilities.h"
 test -f "$KERNEL_PRIVATE/machine/cpu_capabilities.h"
 test -f "$KERNEL_PRIVATE/arm/cpu_capabilities.h"
+
+# tracepoint_private.h includes atm/atm_internal.h when KERNEL is defined.
+# These are the exact header paths and dependencies from the pinned XNU tree:
+# osfmk/atm/atm_internal.h -> osfmk/atm/atm_types.h, libkern/os/refcnt.h
+# libkern/os/refcnt.h -> libkern/os/refcnt_internal.h.
+ATM_HEADERS="$KERNEL_PRIVATE/atm"
+sudo mkdir -p "$ATM_HEADERS"
+sudo cp "$ROOT/kernel/xnu/upstream/osfmk/atm/atm_internal.h" "$ATM_HEADERS/atm_internal.h"
+sudo cp "$ROOT/kernel/xnu/upstream/osfmk/atm/atm_types.h" "$ATM_HEADERS/atm_types.h"
+sudo cp "$ROOT/kernel/xnu/upstream/libkern/os/refcnt.h" "$KERNEL_PRIVATE_OS/refcnt.h"
+sudo cp "$ROOT/kernel/xnu/upstream/libkern/os/refcnt_internal.h" "$KERNEL_PRIVATE_OS/refcnt_internal.h"
+test -s "$ATM_HEADERS/atm_internal.h"
+test -s "$ATM_HEADERS/atm_types.h"
+test -s "$KERNEL_PRIVATE_OS/refcnt.h"
+test -s "$KERNEL_PRIVATE_OS/refcnt_internal.h"
+
 echo "xnu_private_atomic_headers=staged" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "xnu_private_cpu_capability_headers=staged_from_pinned_xnu_source" >> "$EVIDENCE/dependency-prepare-status.txt"
+echo "xnu_atm_headers=staged_from_pinned_xnu_source" >> "$EVIDENCE/dependency-prepare-status.txt"
+echo "xnu_refcnt_header_pair=staged_from_pinned_xnu_source" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "xnu_full_installhdrs=blocked_by_DriverKit_IOTypes.h_source_rule" >> "$EVIDENCE/dependency-prepare-status.txt"
 FIREHOSE_HEADERS="$SDKROOT/usr/local/include/firehose"
 sudo mkdir -p "$FIREHOSE_HEADERS"
