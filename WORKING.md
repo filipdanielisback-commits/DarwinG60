@@ -233,3 +233,16 @@ See [display event pipeline documentation](docs/architecture/display-event-pipel
 | Pixel rendering / GPU / framebuffer | Planned | No rasterization or physical display output |
 
 See [graphical compositor prototype](docs/architecture/graphical-compositor-prototype.md).
+
+
+## System shell prototype
+
+| Feature | Status | Notes |
+|---|---|---|
+| Home screen and app shortcuts | Host prototype | In-process app selection model only |
+| Status bar | Host prototype | Clock and simulated connectivity / demo battery values |
+| Quick Settings | Host prototype | Wi-Fi, Bluetooth and Do Not Disturb toggles are simulated |
+| Notifications panel | Host prototype | In-memory notification records and dismiss operation |
+| System app execution / hardware indicators | Planned | No OS process launch or physical device integration |
+
+See [system shell prototype](docs/architecture/system-shell-prototype.md).
