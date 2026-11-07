@@ -1,11 +1,14 @@
 """Tests for the non-destructive XNU readiness audit."""
 from __future__ import annotations
 
+import hashlib
+import json
 import tempfile
 import unittest
 from pathlib import Path
 
 from darwing60.xnu_readiness import (
+    EXPECTED_SOURCE_COMMIT,
     EXPECTED_TAG,
     EXPECTED_TAG_OBJECT,
     XNUReadinessError,
@@ -18,17 +21,29 @@ def make_repository(root: Path) -> None:
     xnu = root / "kernel" / "xnu"
     xnu.mkdir(parents=True)
     (xnu / "UPSTREAM.lock").write_text(
-        '\n'.join([
+        "\n".join([
             'repository = "https://github.com/apple-oss-distributions/xnu"',
             f'tag = "{EXPECTED_TAG}"',
             f'tag_object = "{EXPECTED_TAG_OBJECT}"',
+            f'source_commit = "{EXPECTED_SOURCE_COMMIT}"',
             'source_archive = "https://github.com/apple-oss-distributions/xnu/archive/refs/tags/xnu-11215.1.10.tar.gz"',
             'license = "APPLE_LICENSE"',
             'license_name = "Apple Public Source License 2.0"',
-        ]) + '\n',
+        ]) + "\n",
         encoding="utf-8",
     )
     (xnu / "APPLE_LICENSE").write_text("license text", encoding="utf-8")
+
+
+def make_imported_submodule(root: Path) -> None:
+    upstream = root / "kernel" / "xnu" / "upstream"
+    upstream.mkdir(parents=True)
+    for name in ("README.md", "APPLE_LICENSE"):
+        (upstream / name).write_text("upstream marker", encoding="utf-8")
+    for name in ("osfmk", "bsd", "iokit"):
+        (upstream / name).mkdir()
+    # Git submodules commonly use a .git *file*, not a .git directory.
+    (upstream / ".git").write_text("gitdir: ../../.git/modules/kernel/xnu/upstream\n")
 
 
 class XNUReadinessTests(unittest.TestCase):
@@ -45,17 +60,22 @@ class XNUReadinessTests(unittest.TestCase):
         self.assertFalse(milestones["build_environment_candidate"])
         self.assertFalse(milestones["kernel_build_verified"])
 
-    def test_source_import_requires_all_expected_upstream_sentinels(self):
+    def test_source_import_requires_expected_tree_and_git_metadata(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             make_repository(root)
-            upstream = root / "kernel" / "xnu" / "upstream"
-            upstream.mkdir()
-            for name in ("README.md", "osfmk", "bsd", "iokit", "APPLE_LICENSE"):
-                path = upstream / name
-                path.mkdir() if name in {"osfmk", "bsd", "iokit"} else path.write_text("x")
+            make_imported_submodule(root)
             report = audit_xnu_readiness(root, environ={}, platform_name="Linux")
         self.assertTrue(report["milestones"]["source_tree_imported"])
+
+    def test_tree_without_git_metadata_is_not_counted_as_submodule_import(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            make_repository(root)
+            make_imported_submodule(root)
+            (root / "kernel" / "xnu" / "upstream" / ".git").unlink()
+            report = audit_xnu_readiness(root, environ={}, platform_name="Linux")
+        self.assertFalse(report["milestones"]["source_tree_imported"])
 
     def test_mismatched_tag_object_is_an_error(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -110,21 +130,73 @@ class XNUReadinessTests(unittest.TestCase):
             report = audit_xnu_readiness(root, environ={}, platform_name="Darwin")
         self.assertFalse(report["milestones"]["kernel_build_verified"])
 
-    def test_reviewed_build_record_is_read_from_audited_repository(self):
+    def test_build_verification_requires_real_hashed_artifact_and_log(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             make_repository(root)
-            upstream = root / "kernel" / "xnu" / "upstream"
-            upstream.mkdir()
-            record = upstream / "DARWING60-BUILD-VERIFICATION.txt"
-            record.write_text(
-                f"result=success\ntag={EXPECTED_TAG}\n"
-                f"tag_object={EXPECTED_TAG_OBJECT}\nreviewed_by=test\n",
-                encoding="utf-8",
-            )
+            xnu = root / "kernel" / "xnu"
+            artifact = xnu / "build" / "kernel.test"
+            log = xnu / "build" / "build.log"
+            artifact.parent.mkdir()
+            artifact.write_bytes(b"test kernel artifact")
+            log.write_text("successful build log", encoding="utf-8")
+            record = {
+                "result": "success",
+                "tag": EXPECTED_TAG,
+                "tag_object": EXPECTED_TAG_OBJECT,
+                "source_commit": EXPECTED_SOURCE_COMMIT,
+                "build_host": "macOS test host",
+                "sdk": "test SDK",
+                "command": "make test-target",
+                "artifact": "build/kernel.test",
+                "artifact_sha256": hashlib.sha256(artifact.read_bytes()).hexdigest(),
+                "log": "build/build.log",
+                "log_sha256": hashlib.sha256(log.read_bytes()).hexdigest(),
+                "reviewed_by": "test reviewer",
+            }
+            (xnu / "build-verification.json").write_text(json.dumps(record), encoding="utf-8")
             report = audit_xnu_readiness(root, environ={}, platform_name="Linux")
         self.assertTrue(report["milestones"]["kernel_build_verified"])
-        self.assertIn(str(record), report["build_verification"]["record_path"])
+
+    def test_build_record_rejects_modified_artifact(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            make_repository(root)
+            xnu = root / "kernel" / "xnu"
+            artifact = xnu / "build" / "kernel.test"
+            log = xnu / "build" / "build.log"
+            artifact.parent.mkdir()
+            artifact.write_bytes(b"artifact")
+            log.write_text("log", encoding="utf-8")
+            record = {
+                "result": "success", "tag": EXPECTED_TAG,
+                "tag_object": EXPECTED_TAG_OBJECT, "source_commit": EXPECTED_SOURCE_COMMIT,
+                "build_host": "macOS", "sdk": "SDK", "command": "make",
+                "artifact": "build/kernel.test", "artifact_sha256": "0" * 64,
+                "log": "build/build.log",
+                "log_sha256": hashlib.sha256(log.read_bytes()).hexdigest(),
+                "reviewed_by": "reviewer",
+            }
+            (xnu / "build-verification.json").write_text(json.dumps(record), encoding="utf-8")
+            report = audit_xnu_readiness(root, environ={}, platform_name="Linux")
+        self.assertFalse(report["milestones"]["kernel_build_verified"])
+
+    def test_build_record_cannot_reference_files_outside_xnu_directory(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            make_repository(root)
+            xnu = root / "kernel" / "xnu"
+            record = {
+                "result": "success", "tag": EXPECTED_TAG,
+                "tag_object": EXPECTED_TAG_OBJECT, "source_commit": EXPECTED_SOURCE_COMMIT,
+                "build_host": "macOS", "sdk": "SDK", "command": "make",
+                "artifact": "../../outside", "artifact_sha256": "0" * 64,
+                "log": "../../outside", "log_sha256": "0" * 64,
+                "reviewed_by": "reviewer",
+            }
+            (xnu / "build-verification.json").write_text(json.dumps(record), encoding="utf-8")
+            report = audit_xnu_readiness(root, environ={}, platform_name="Linux")
+        self.assertFalse(report["milestones"]["kernel_build_verified"])
 
     def test_report_states_non_destructive_scope(self):
         with tempfile.TemporaryDirectory() as temporary:
