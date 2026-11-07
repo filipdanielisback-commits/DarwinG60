@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "device_codename": "hanoip",
+  "overall_status": "research_only",
+  "legend": {
+    "documented": "Supported by a cited public device specification or device tree; not necessarily tested by DarwinG60.",
+    "unknown": "Requires further research or direct evidence.",
+    "not_implemented": "DarwinG60 has no implementation for this component.",
+    "not_tested": "An implementation or hypothesis exists but has not been validated on target hardware."
+  },
+  "components": [
+    {
+      "name": "ARM64 CPU execution environment",
+      "status": "documented",
+      "evidence": "The device family is based on a 64-bit Qualcomm Snapdragon 732G platform.",
+      "darwing60_implementation": "None"
+    },
+    {
+      "name": "Adreno 618 graphics",
+      "status": "documented",
+      "evidence": "Published Moto G60 specifications identify Adreno 618.",
+      "darwing60_implementation": "None"
+    },
+    {
+      "name": "Display controller and panel initialization",
+      "status": "unknown",
+      "evidence": "Panel specifications alone do not describe the low-level initialization sequence.",
+      "darwing60_implementation": "None"
+    },
+    {
+      "name": "Interrupt controller and timer configuration",
+      "status": "unknown",
+      "evidence": "Requires verified platform and firmware documentation.",
+      "darwing60_implementation": "None"
+    },
+    {
+      "name": "Storage and partition access",
+      "status": "unknown",
+      "evidence": "Partition layout and storage controller details have not been independently validated for this project.",
+      "darwing60_implementation": "None"
+    },
+    {
+      "name": "Touchscreen, audio, Wi-Fi, Bluetooth, camera and sensors",
+      "status": "not_implemented",
+      "evidence": "No DarwinG60 drivers exist for these components.",
+      "darwing60_implementation": "None"
+    },
+    {
+      "name": "Darwin/XNU kernel boot on Moto G60",
+      "status": "not_implemented",
+      "evidence": "No XNU port, platform bring-up, or hardware boot test exists in this repository.",
+      "darwing60_implementation": "None"
+    }
+  ],
+  "safety_boundary": "Research and host-side simulation only. No flashing, partition writes, bootloader changes, or device modification is part of this project."
+}
