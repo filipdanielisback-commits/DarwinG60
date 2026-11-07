@@ -25,3 +25,10 @@ python tools/device_info.py --check
 ```
 
 The commands read repository files only. They do not communicate with or modify a phone.
+
+## Hardware research
+
+See the [Moto G60 hardware research dossier](../../docs/porting/hanoip-hardware-research.md)
+for sourced findings, confidence levels, unresolved component identifiers,
+and the seven driver-development gap lists. No functional DarwinG60 hardware
+drivers are included.
