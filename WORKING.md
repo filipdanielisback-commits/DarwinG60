@@ -154,7 +154,7 @@ See [driver registry documentation](docs/architecture/driver-registry.md).
 | Feature | Status | Notes |
 |---|---|---|
 | Seven-category hardware research dossier | Host prototype | Public-source review; exact component IDs remain unresolved |
-| Display/touch panel identification | Research | Resolution conflict and exact controller unknown |
+| Display/touch panel identification | Research | Archived kernel DTS identifies Tianma/ILI7807S 1080×2460 config with 60/120 Hz modes; exact module SKU unknown |
 | GPU platform identification | Documented | Adreno 618; no DarwinG60 GPU driver |
 | Wireless platform research | Research | FastConnect platform features found; exact handset module unconfirmed |
 | Battery capacity research | Documented | 6000 mAh listed in community sources; charging IC unknown |
@@ -182,8 +182,8 @@ See [driver framework design](docs/architecture/driver-framework.md).
 | Synthetic frame sequence | Host prototype | Metadata counter only; no framebuffer or scanout |
 | Normalized multi-touch event model | Host prototype | Validates and converts synthetic events |
 | Rotation-aware coordinate conversion | Host prototype | Logical coordinates only |
-| Moto G60 panel identification | Research | Resolution conflict remains unresolved |
-| Moto G60 touch-controller identification | Research | Exact controller and interface unknown |
+| Moto G60 panel identification | Research | Kernel DTS supports 1080×2460 Tianma/ILI7807S configuration; exact module SKU unconfirmed |
+| Moto G60 touch-controller identification | Research | DTS says ILITEK over SPI; exact IC unknown and Android NVT-ts path conflicts |
 | Physical display/touch driver | Not implemented | Requires verified hardware and kernel interfaces |
 
 See [display/touch prototype](docs/architecture/display-touch-prototype.md).
