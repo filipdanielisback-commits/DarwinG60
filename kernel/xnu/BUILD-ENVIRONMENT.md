@@ -15,12 +15,14 @@ A host candidate is not a successful or compatible XNU build.
 
 The README at the exact pinned XNU tag documents the generic make interface and says the kernel version is read from System.kext metadata in the SDK or KDK. It does not, by itself, specify a complete external Apple-Silicon dependency matrix.
 
-Apple's external-build guidance in the Apple Open Source XNU documentation adds the following for Apple-Silicon hosts:
+The official Apple OSS `distribution-macOS` manifest at commit `fafa0d30e9943c16e82740488dc0750c24355562` identifies this XNU tag as the macOS 15.0 source release and pins the matching public source dependencies in [DEPENDENCIES.lock](DEPENDENCIES.lock): AvailabilityVersions 143.3 and libdispatch 1502.0.1. Their exact annotated tag objects and peeled commits are recorded there.
+
+The following external-build procedure is documented in the `apple-open-source/macos` XNU README mirror; treat it as build guidance to validate against the pinned tag, not as a guarantee that all details match every XNU release. It identifies the following for Apple-Silicon hosts:
 
 - A Kernel Debug Kit (KDK) matching the exact macOS version/build of the build host.
-- AvailabilityVersions, including the availability.pl utility.
-- XNU headers installed into the SDK.
-- libdispatch's libfirehose_kernel build product.
+- AvailabilityVersions `AvailabilityVersions-143.3`, which supplies `availability.pl` for the macOS 15.0 source release.
+- XNU headers generated from the pinned XNU source and installed into the SDK.
+- libdispatch `libdispatch-1502.0.1`, providing the `libfirehose_kernel` build product.
 - DTrace CTF tools are optional.
 
 References:
@@ -55,9 +57,9 @@ The override was diagnostic only. 24.0.0 is not asserted to be the correct sourc
 ## What remains to identify
 
 - The exact macOS host build number for the runner used by the next attempt.
-- A KDK package whose version/build matches that host, including its System.kext metadata.
-- AvailabilityVersions source release compatible with this XNU build and the exact availability.pl install location.
-- libdispatch source revision and libfirehose_kernel build/install requirements.
+- A KDK package whose version/build matches that host, including its System.kext metadata. The macOS 15.0 XNU release manifest does not identify this host KDK; it is a separate host-side dependency.
+- Build/install validation of AvailabilityVersions `143.3` and the exact `availability.pl` install location.
+- Build/install validation of libdispatch `1502.0.1` and its `libfirehose_kernel` product.
 - Whether the pinned XNU source can export and install the required headers against the chosen SDK.
 - Whether any additional Apple-Silicon TARGET_CONFIGS platform selection is required by this XNU revision and runner hardware.
 
@@ -83,3 +85,23 @@ A future build is only eligible for kernel_build_verified when all of the follow
 - SHA-256 hashes for the artifact and complete build log.
 
 A successful CI workflow or a compiler being present is not sufficient. No output from these host builds is to be installed or booted on a phone.
+
+
+## Source-release dependency pins
+
+The official Apple OSS release manifest at commit `fafa0d30e9943c16e82740488dc0750c24355562` declares the macOS 15.0 source set:
+
+| Component | Pinned tag | Peeled source commit |
+|---|---|---|
+| XNU | `xnu-11215.1.10` | `8d741a5de7ff4191bf97d57b9f54c2f6d4a15585` |
+| AvailabilityVersions | `AvailabilityVersions-143.3` | `b687146a07d05ab281d25a94114addba4ce6cc76` |
+| libdispatch | `libdispatch-1502.0.1` | `bd82a60ee6a73b4eca50af028b48643d51aaf1ea` |
+| dtrace (optional) | `dtrace-409` | not needed for the initial kernel compile |
+
+This is a better source-dependency baseline than taking the newest versions of these projects. The tag and commit pins are independently recorded in `DEPENDENCIES.lock`.
+
+## KDK identification rule
+
+The KDK is **not** selected by matching its name to `xnu-11215.1.10`. The external-build guidance requires the KDK matching the exact macOS version/build of the Apple-Silicon build host. Therefore the workflow must first record `sw_vers -productVersion` and `sw_vers -buildVersion`, then inspect `/Library/Developer/KDKs` and verify the selected KDK's `System.kext/Info.plist:CFBundleVersion`. The GitHub-hosted runner currently has no confirmed KDK, so an exact package name cannot honestly be stated yet.
+
+Apple distributes KDKs through its developer downloads. The project will not fetch an authenticated package using stored personal credentials or use an unverified third-party binary. A KDK must be provided through an authorized, controlled build environment before the ARM64 build can be marked verified.
