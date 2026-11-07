@@ -96,17 +96,43 @@ jobs:
           print("ci_driverkit_header_export=skipped_for_generic_kernel_build")
           PY
           echo "driverkit_export=omitted_from_generic_kernel_header_export_only" >> "$evidence/kernel-build-status.txt"
-          # Keep exporthdrs and all in one make process so generated headers
-          # remain available to dependent targets. Attempt the build with the
-          # public SDK even when no KDK is installed; record that condition
-          # rather than treating an unverified prerequisite as a hard stop.
+          # The public SDK may not ship Apple's private platform header
+          # directory. Do not pass a nonexistent -I path to Clang; retain the
+          # include path whenever a matching SDK/KDK actually provides it.
+          python3 - <<'PY'
+          from pathlib import Path
+          makefile = Path("makedefs/MakeInc.def")
+          source = makefile.read_text()
+          expected = "INCFLAGS_PLATFORM = -I$(SDKROOT)/$(KPINCDIR)/platform"
+          replacement = "INCFLAGS_PLATFORM = $(if $(wildcard $(SDKROOT)/$(KPINCDIR)/platform),-I$(SDKROOT)/$(KPINCDIR)/platform)"
+          if source.count(expected) != 1:
+              raise SystemExit("Expected exactly one platform include rule; refusing an ambiguous patch")
+          makefile.write_text(source.replace(expected, replacement))
+          print("ci_platform_include=only_when_sdk_directory_exists")
+          PY
+          echo "platform_include=conditional_on_real_sdk_directory" >> "$evidence/kernel-build-status.txt"
+          # exporthdrs does not materialize an empty libsa export directory
+          # on this public source tag, although compile flags reference it.
+          # Run exports first, then create that empty search directory, then
+          # compile. Serial make avoids the config helper race seen earlier.
           set +e
           if [ -n "$KDK_ROOT" ]; then
-            make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j1 exporthdrs all > "$evidence/kernel-build.log" 2>&1
+            make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j1 exporthdrs > "$evidence/kernel-build.log" 2>&1
+            status=$?
+            if [ "$status" -eq 0 ]; then
+              mkdir -p BUILD/obj/EXPORT_HDRS/libsa
+              make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j1 all >> "$evidence/kernel-build.log" 2>&1
+              status=$?
+            fi
           else
-            make SDKROOT="$SDKROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j1 exporthdrs all > "$evidence/kernel-build.log" 2>&1
+            make SDKROOT="$SDKROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j1 exporthdrs > "$evidence/kernel-build.log" 2>&1
+            status=$?
+            if [ "$status" -eq 0 ]; then
+              mkdir -p BUILD/obj/EXPORT_HDRS/libsa
+              make SDKROOT="$SDKROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j1 all >> "$evidence/kernel-build.log" 2>&1
+              status=$?
+            fi
           fi
-          status=$?
           set -e
           echo "make_exit_code=$status" >> "$evidence/kernel-build-status.txt"
           artifact="$(find BUILD -type f -name 'kernel.development*' -size +0c -print -quit 2>/dev/null || true)"
