@@ -33,5 +33,11 @@ jobs:
         run: python tools/render_shell.py
       - name: Verify generated SVG preview
         run: python -c "import xml.etree.ElementTree as ET; ET.parse('build/darwing60-shell-demo.svg')"
+      - name: Upload synthetic shell preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: darwing60-shell-preview
+          path: build/darwing60-shell-demo.svg
+          if-no-files-found: error
       - name: Run project checker
         run: python tools/dg60_check.py
