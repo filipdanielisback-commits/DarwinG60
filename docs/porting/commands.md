@@ -40,3 +40,13 @@ sources, document its boot architecture, and map required drivers. Unknown or
 unverified fields must remain marked as unknown. Any future device-level
 experiments require a separate safety and feasibility review; this project
 does not provide firmware-modification or flashing instructions.
+
+
+## Generate a starter profile
+
+```sh
+python tools/generate_device_profile.py --codename example-device --manufacturer Example --model "Example Phone"
+```
+
+The generator creates metadata templates only and refuses to overwrite an
+existing profile. See [profile generator details](profile-generator.md).
