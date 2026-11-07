@@ -112,3 +112,16 @@ The subsequent XNU kernel build step did **not** run. The runner inventory still
 The KDK is an Apple-distributed, separate download. Apple's documentation directs developers to download the KDK for the macOS version being debugged and links to the authenticated More Downloads page: https://developer.apple.com/documentation/apple-silicon/debugging-a-custom-kernel-extension and https://developer.apple.com/download/more/. The CI workflow will not use an unverified third-party mirror or store developer credentials. A matching kit must be supplied in an authorized macOS build environment and checked for its `System.kext` metadata before the kernel build can proceed.
 
 Evidence artifact from this run: [xnu-arm64-build-evidence](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42391235120/artifacts/13581053391).
+
+
+## Run #214: public-source dependency and Clang diagnostics (2026-11-07)
+
+Run [42394824559](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42394824559) checked out the pinned XNU commit and completed dependency preparation, then entered kernel compilation. It did **not** produce a kernel artifact. The evidence archive is [xnu-arm64-build-evidence](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42394824559/artifacts/13582708382).
+
+The build log records these distinct failures:
+
+- libkern/libkern/amfi/amfi.h includes the header TrustCache/API.h, but that header is not present in the pinned XNU source or its EXTERNAL_HEADERS export rules. The official macOS 15.0 distribution-macOS manifest used for the current dependency pins lists XNU, AvailabilityVersions and libdispatch, but no public TrustCache source project. The include is part of the public AMFI interface; it must not be replaced with a fabricated or guessed compatibility header. A matching, authorized source for the exact TrustCache API revision is still required.
+- C translation units fail -Wpre-c11-compat for _Atomic and _Static_assert. The build needs a source-compatible C language mode or a narrowly justified compiler configuration, validated against the pinned build system.
+- Clang 17 also promotes several diagnostics to errors, including -Wformat, -Wsuggest-override, -Wsuggest-destructor-override, -Wmissing-designated-field-initializers, and -Wunused-but-set-variable. These are not all equivalent: format diagnostics may indicate real type/format mismatches and must not be globally suppressed. Each needs to be compared with the compiler version and source release expectations, with actual source corrections where appropriate.
+
+No warning policy was weakened and no TrustCache API was fabricated. Until the exact TrustCache dependency is available and the compiler issues are resolved, this source set cannot be truthfully marked as a successful ARM64 kernel build. The build remains **not verified**; this is not a Moto G60 platform kernel.
