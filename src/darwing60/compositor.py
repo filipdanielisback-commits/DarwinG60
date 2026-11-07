@@ -127,7 +127,8 @@ class SceneComposer:
             raise CompositorError("Hit-test coordinates must be integers.")
         candidates = sorted(
             (item for item in self._surfaces.values()
-             if item.visible and item.bounds.contains(x, y)),
+             if item.visible and item.role != "background"
+             and item.bounds.contains(x, y)),
             key=lambda item: item.z_index,
             reverse=True,
         )
