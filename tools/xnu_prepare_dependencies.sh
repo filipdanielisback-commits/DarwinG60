@@ -71,6 +71,10 @@ for header in atomic_private.h atomic_private_arch.h atomic_private_impl.h; do
   sudo cp "$source" "$KERNEL_PRIVATE_OS/$header"
 done
 test -f "$KERNEL_PRIVATE_OS/atomic_private.h"
+sudo mkdir -p "$SDKROOT/System/Library/Frameworks/Kernel.framework/PrivateHeaders/machine"
+sudo mkdir -p "$SDKROOT/System/Library/Frameworks/Kernel.framework/PrivateHeaders/arm"
+sudo cp "$ROOT/kernel/xnu/upstream/osfmk/machine/cpu_number.h" "$SDKROOT/System/Library/Frameworks/Kernel.framework/PrivateHeaders/machine/cpu_number.h"
+sudo cp "$ROOT/kernel/xnu/upstream/osfmk/arm/cpu_number.h" "$SDKROOT/System/Library/Frameworks/Kernel.framework/PrivateHeaders/arm/cpu_number.h"
 echo "xnu_private_atomic_headers=staged" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "xnu_full_installhdrs=blocked_by_DriverKit_IOTypes.h_source_rule" >> "$EVIDENCE/dependency-prepare-status.txt"
 
