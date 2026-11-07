@@ -9,7 +9,7 @@ DarwinG60 is an exploratory, open-source research project. Its long-term goal is
 
 ## Project status
 
-<badge>Research / pre-alpha</badge>
+**Status: Research / pre-alpha**
 
 - [x] Repository and project scope established
 - [ ] Verify device hardware and boot-chain documentation
