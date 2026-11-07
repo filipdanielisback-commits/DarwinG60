@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "device": "synthetic-test-fixture",
+  "warning": "NOT Moto G60 hardware data. Never use as a physical panel configuration.",
+  "synthetic": true,
+  "panel": {
+    "name": "Example 800x600 panel",
+    "hardware_identifier": null,
+    "modes": [
+      {
+        "name": "test-60hz",
+        "width": 800,
+        "height": 600,
+        "refresh_hz": 60
+      },
+      {
+        "name": "test-low-refresh",
+        "width": 800,
+        "height": 600,
+        "refresh_hz": 30
+      }
+    ],
+    "preferred_mode": "test-60hz"
+  },
+  "touch": {
+    "coordinate_space": "normalized-0-to-1",
+    "controller_identifier": null,
+    "bus": null,
+    "interrupt": null
+  }
+}
