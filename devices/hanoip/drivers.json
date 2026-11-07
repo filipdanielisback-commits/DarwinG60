@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "device_codename": "hanoip",
+  "scope": "Planning metadata only. No DarwinG60 driver implementation or hardware support is implied.",
+  "drivers": [
+    {
+      "id": "display_touch",
+      "name": "Display and touchscreen",
+      "scope": "Panel output, display modes, touch input and gesture events.",
+      "status": "research",
+      "hardware": "Display and touch controller identifiers and interfaces require device-specific verification.",
+      "darwing60_implementation": "None",
+      "evidence": [],
+      "tests": [],
+      "gaps": ["Identify panel and touch-controller variants from reliable device documentation.", "Research display pipeline and touch event interfaces."]
+    },
+    {
+      "id": "gpu",
+      "name": "GPU",
+      "scope": "Graphics device discovery, command submission research and rendering acceleration.",
+      "status": "research",
+      "hardware": "Adreno 618 is listed in published Moto G60 specifications; low-level interface details remain to be researched.",
+      "darwing60_implementation": "None",
+      "evidence": [],
+      "tests": [],
+      "gaps": ["Research the documented GPU software stack and licensing constraints.", "Define a future graphics abstraction without assuming acceleration works."]
+    },
+    {
+      "id": "wifi_bluetooth",
+      "name": "Wi-Fi and Bluetooth",
+      "scope": "Wireless networking, radio control and Bluetooth device communication.",
+      "status": "planned",
+      "hardware": "Exact wireless chipset and firmware requirements need verified device-specific evidence.",
+      "darwing60_implementation": "None",
+      "evidence": [],
+      "tests": [],
+      "gaps": ["Identify wireless chipset and supported interfaces.", "Document firmware and driver availability; no radio control is implemented."]
+    },
+    {
+      "id": "battery_power",
+      "name": "Battery and charging",
+      "scope": "Battery telemetry, charging state, thermal signals and power policy.",
+      "status": "planned",
+      "hardware": "Fuel-gauge, charger and thermal interfaces are not yet identified for this profile.",
+      "darwing60_implementation": "None",
+      "evidence": [],
+      "tests": [],
+      "gaps": ["Research battery and charging telemetry interfaces.", "Design a safe read-only power status abstraction."]
+    },
+    {
+      "id": "audio",
+      "name": "Audio",
+      "scope": "Audio routing, playback, capture and codec research.",
+      "status": "planned",
+      "hardware": "Audio codec and routing details require device-specific verification.",
+      "darwing60_implementation": "None",
+      "evidence": [],
+      "tests": [],
+      "gaps": ["Identify audio codec and audio-routing architecture.", "Document playback and capture requirements."]
+    },
+    {
+      "id": "sensors",
+      "name": "Sensors",
+      "scope": "Sensor discovery and standardized motion, orientation and environmental events.",
+      "status": "planned",
+      "hardware": "Sensor inventory and bus connections require reliable device-specific evidence.",
+      "darwing60_implementation": "None",
+      "evidence": [],
+      "tests": [],
+      "gaps": ["Create a sourced sensor inventory.", "Define a common sensor event model."]
+    },
+    {
+      "id": "storage",
+      "name": "Storage",
+      "scope": "Storage-controller research, block-device abstraction and filesystem integration.",
+      "status": "planned",
+      "hardware": "Storage controller and partition details require device-specific verification.",
+      "darwing60_implementation": "None",
+      "evidence": [],
+      "tests": [],
+      "gaps": ["Verify storage controller and media details from trusted sources.", "Design host-testable block-device interfaces; no partition access is implemented."]
+    }
+  ]
+}
