@@ -6,6 +6,8 @@ It does not download, configure, compile, install, or boot XNU.
 from __future__ import annotations
 
 import ast
+import hashlib
+import json
 import os
 import platform
 import shutil
@@ -19,6 +21,7 @@ EXPECTED_TAG = "xnu-11215.1.10"
 EXPECTED_TAG_OBJECT = "d95cbeef34d1a9cca097b33d385db3b2aae1a755"
 EXPECTED_SOURCE_COMMIT = "8d741a5de7ff4191bf97d57b9f54c2f6d4a15585"
 SOURCE_TREE = XNU_ROOT / "upstream"
+BUILD_RECORD = XNU_ROOT / "build-verification.json"
 SOURCE_SENTINELS = ("README.md", "osfmk", "bsd", "iokit", "APPLE_LICENSE")
 
 
@@ -85,8 +88,9 @@ def audit_xnu_readiness(
     missing_source_items = [
         item for item in SOURCE_SENTINELS if not (source_root / item).exists()
     ]
-    source_imported = not missing_source_items and (source_root / ".git").exists()
-    if not (source_root / ".git").exists():
+    git_metadata = source_root / ".git"
+    source_imported = not missing_source_items and git_metadata.exists()
+    if not git_metadata.exists():
         missing_source_items.append(".git submodule metadata (initialize submodules)")
 
     required_commands = ("make", "clang", "xcrun", "xcodebuild")
@@ -100,23 +104,51 @@ def audit_xnu_readiness(
         and sdkroot_present
     )
 
-    # A build is only counted when a human-reviewed verification record exists.
-    # The checker deliberately does not infer success from binaries or log files.
-    build_record = source_root / "DARWING60-BUILD-VERIFICATION.txt"
-    build_record_present = build_record.is_file()
+    # A build is only counted when a reviewed record points to real, hashed
+    # artifacts and logs inside this repository (never inside the upstream submodule).
     build_verified = False
-    if build_record_present:
+    build_record_errors: list[str] = []
+    if BUILD_RECORD.is_file():
         try:
-            record_text = build_record.read_text(encoding="utf-8")
-        except OSError:
-            record_text = ""
-        build_verified = (
-            "result=success" in record_text.splitlines()
-            and f"tag={EXPECTED_TAG}" in record_text.splitlines()
-            and f"tag_object={EXPECTED_TAG_OBJECT}" in record_text.splitlines()
-            and f"source_commit={EXPECTED_SOURCE_COMMIT}" in record_text.splitlines()
-            and "reviewed_by=" in record_text
-        )
+            record = json.loads(BUILD_RECORD.read_text(encoding="utf-8"))
+            required_fields = (
+                "result", "tag", "tag_object", "source_commit", "build_host",
+                "sdk", "command", "artifact", "artifact_sha256", "log",
+                "log_sha256", "reviewed_by",
+            )
+            for field in required_fields:
+                if not isinstance(record.get(field), str) or not record[field].strip():
+                    build_record_errors.append(f"Missing build record field: {field}")
+            if record.get("result") != "success":
+                build_record_errors.append("Build record result is not success.")
+            if record.get("tag") != EXPECTED_TAG:
+                build_record_errors.append("Build record tag does not match the pinned tag.")
+            if record.get("tag_object") != EXPECTED_TAG_OBJECT:
+                build_record_errors.append("Build record tag object does not match.")
+            if record.get("source_commit") != EXPECTED_SOURCE_COMMIT:
+                build_record_errors.append("Build record source commit does not match.")
+            for path_field, hash_field in (("artifact", "artifact_sha256"), ("log", "log_sha256")):
+                relative = record.get(path_field)
+                expected_hash = record.get(hash_field)
+                if not isinstance(relative, str) or not isinstance(expected_hash, str):
+                    continue
+                candidate = (xnu_root / relative).resolve()
+                try:
+                    candidate.relative_to(xnu_root.resolve())
+                except ValueError:
+                    build_record_errors.append(f"{path_field} must stay inside kernel/xnu/.")
+                    continue
+                if not candidate.is_file():
+                    build_record_errors.append(f"Build {path_field} file is missing.")
+                    continue
+                actual_hash = hashlib.sha256(candidate.read_bytes()).hexdigest()
+                if actual_hash != expected_hash:
+                    build_record_errors.append(f"Build {path_field} SHA-256 does not match.")
+            build_verified = not build_record_errors
+        except (OSError, json.JSONDecodeError) as exc:
+            build_record_errors.append(f"Cannot read build verification record: {exc}")
+    else:
+        build_record_errors.append("No reviewed build-verification.json record exists.")
 
     return {
         "project": "DarwinG60",
@@ -155,9 +187,10 @@ def audit_xnu_readiness(
         },
         "build_verification": {
             "status": "verified" if build_verified else "not_verified",
-            "record_path": str(build_record),
+            "record_path": str(BUILD_RECORD),
+            "errors": build_record_errors,
             "note": (
-                "A reviewed build record is required; the audit never compiles XNU."
+                "A reviewed JSON record, matching pinned source, and SHA-256-verified build artifact and log are required; the audit never compiles XNU."
             ),
         },
         "device_port_status": "not_ported; Moto G60 platform support unverified",
