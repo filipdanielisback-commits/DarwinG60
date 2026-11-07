@@ -75,3 +75,15 @@ Start with [CONTRIBUTING.md](CONTRIBUTING.md), then review the [roadmap](ROADMAP
 Original project code and documentation are offered under the MIT License in [LICENSE](LICENSE). This license does not apply to third-party code, trademarks, firmware, or proprietary components. Any future third-party source imports must retain their original licenses and notices.
 
 Apple, iOS, and Darwin are trademarks or products of their respective owners. This is an independent community research project and is not affiliated with or endorsed by Apple or Motorola.
+
+## Host-side prototype
+
+The repository now includes a harmless Python boot-menu simulation and repository checker. These run on a host environment and do not interact with a phone:
+
+```sh
+python3 tools/menu_demo.py
+python3 tools/dg60_check.py
+python3 -m unittest discover -s tests -v
+```
+
+The menu is a user-interface concept only. It cannot launch Android, load XNU, or change device boot settings. See [the menu design](docs/design/boot-menu.md) and [development guide](docs/development.md).
