@@ -187,3 +187,14 @@ See [driver framework design](docs/architecture/driver-framework.md).
 | Physical display/touch driver | Not implemented | Requires verified hardware and kernel interfaces |
 
 See [display/touch prototype](docs/architecture/display-touch-prototype.md).
+
+
+## Hardware evidence ledger
+
+| Feature | Status | Notes |
+|---|---|---|
+| Source-backed hardware evidence ledger | Host prototype | Separates source observations from physical-hardware conclusions |
+| Evidence-ledger validator | Host prototype | Checks source references, statuses, required fields and duplicate IDs |
+| Touch-controller physical identity | Unresolved | ILITEK kernel binding and NVT-labelled Android gesture interface remain unreconciled |
+
+See [hardware evidence ledger documentation](docs/porting/hardware-evidence-ledger.md).
