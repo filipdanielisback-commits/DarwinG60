@@ -209,3 +209,15 @@ See [hardware evidence ledger documentation](docs/porting/hardware-evidence-ledg
 | Touch controller and LCD module identity | Unresolved | Physical component identities remain unverified |
 
 See [display/touch profile integration](docs/architecture/display-touch-profile-integration.md).
+
+
+## Display event pipeline
+
+| Feature | Status | Notes |
+|---|---|---|
+| Ordered display mode events | Host prototype | Synchronous host-side event dispatch |
+| Logical rotation events | Host prototype | Rotation-aware synthetic touch coordinates |
+| Touch input event flow | Host prototype | Normalized points transformed to logical pixels |
+| Frame metadata events | Host prototype | Advances metadata counter only; no framebuffer or scanout |
+
+See [display event pipeline documentation](docs/architecture/display-event-pipeline.md).
