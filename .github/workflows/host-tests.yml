@@ -96,9 +96,19 @@ jobs:
           print("ci_driverkit_header_export=skipped_for_generic_kernel_build")
           PY
           echo "driverkit_export=omitted_from_generic_kernel_header_export_only" >> "$evidence/kernel-build-status.txt"
+          # XNU's own README documents the exporthdrs pass before all for
+          # multi-architecture builds. Run it explicitly so generated export
+          # include trees (including libsa) exist before compilation.
           set +e
-          make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT BUILD_LTO=0 -j2 > "$evidence/kernel-build.log" 2>&1
-          status=$?
+          make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT BUILD_LTO=0 -j2 exporthdrs > "$evidence/kernel-build.log" 2>&1
+          export_status=$?
+          echo "exporthdrs_exit_code=$export_status" >> "$evidence/kernel-build-status.txt"
+          if [ "$export_status" -eq 0 ]; then
+            make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT BUILD_LTO=0 -j2 all >> "$evidence/kernel-build.log" 2>&1
+            status=$?
+          else
+            status=$export_status
+          fi
           set -e
           echo "make_exit_code=$status" >> "$evidence/kernel-build-status.txt"
           artifact="$(find BUILD -type f -name 'kernel.development*' -size +0c -print -quit 2>/dev/null || true)"
