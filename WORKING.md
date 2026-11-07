@@ -148,3 +148,18 @@ See [hardware readiness documentation](docs/porting/hardware-readiness.md).
 | Storage driver | Planned | No device storage integration |
 
 See [driver registry documentation](docs/architecture/driver-registry.md).
+
+## Moto G60 hardware research
+
+| Feature | Status | Notes |
+|---|---|---|
+| Seven-category hardware research dossier | Host prototype | Public-source review; exact component IDs remain unresolved |
+| Display/touch panel identification | Research | Resolution conflict and exact controller unknown |
+| GPU platform identification | Documented | Adreno 618; no DarwinG60 GPU driver |
+| Wireless platform research | Research | FastConnect platform features found; exact handset module unconfirmed |
+| Battery capacity research | Documented | 6000 mAh listed in community sources; charging IC unknown |
+| Audio codec identification | Research | Exact codec not confirmed |
+| Sensor inventory | Research | Exact sensor part numbers unknown |
+| Storage controller identification | Research | Capacity variants found; controller/media type unknown |
+
+See [Moto G60 hardware research dossier](docs/porting/hanoip-hardware-research.md).
