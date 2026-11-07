@@ -123,8 +123,23 @@ if [[ ! -d "$DISPATCH_DST/usr/local" ]]; then
   echo "libdispatch build did not stage usr/local" >&2
   exit 1
 fi
+LIBFIREHOSE_ARCHIVE="$DISPATCH_DST/usr/local/lib/kernel/libfirehose_kernel.a"
+if [[ ! -s "$LIBFIREHOSE_ARCHIVE" ]]; then
+  echo "libdispatch did not produce a non-empty libfirehose_kernel.a" >&2
+  exit 1
+fi
+LIBFIREHOSE_ARCHS="$(xcrun lipo -archs "$LIBFIREHOSE_ARCHIVE")"
+for required_arch in arm64 arm64e; do
+  if ! grep -qw "$required_arch" <<< "$LIBFIREHOSE_ARCHS"; then
+    echo "libfirehose_kernel.a is missing required architecture $required_arch: $LIBFIREHOSE_ARCHS" >&2
+    exit 1
+  fi
+done
+echo "libfirehose_kernel_archive=$LIBFIREHOSE_ARCHIVE" >> "$EVIDENCE/dependency-prepare-status.txt"
+echo "libfirehose_kernel_archs=$LIBFIREHOSE_ARCHS" >> "$EVIDENCE/dependency-prepare-status.txt"
 sudo mkdir -p "$SDKROOT/usr/local"
 sudo ditto "$DISPATCH_DST/usr/local" "$SDKROOT/usr/local"
+test -s "$SDKROOT/usr/local/lib/kernel/libfirehose_kernel.a"
 echo "availabilityversions=installed" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "libdispatch=installed" >> "$EVIDENCE/dependency-prepare-status.txt"
 
