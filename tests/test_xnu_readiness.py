@@ -87,6 +87,16 @@ class XNUReadinessTests(unittest.TestCase):
         self.assertFalse(report["milestones"]["source_reference_pinned"])
         self.assertTrue(any("tag object" in item for item in report["baseline"]["errors"]))
 
+    def test_mismatched_source_commit_is_an_error(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            make_repository(root)
+            lock = root / "kernel" / "xnu" / "UPSTREAM.lock"
+            lock.write_text(lock.read_text().replace(EXPECTED_SOURCE_COMMIT, "0" * 40))
+            report = audit_xnu_readiness(root, environ={}, platform_name="Linux")
+        self.assertFalse(report["milestones"]["source_reference_pinned"])
+        self.assertTrue(any("source commit" in item for item in report["baseline"]["errors"]))
+
     def test_missing_license_is_reported(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
