@@ -68,3 +68,22 @@ Evidence: [second GitHub Actions run](https://github.com/filipdanielisback-commi
 Apple's external-build guidance identifies a matching host KDK for Apple-Silicon build hosts, plus AvailabilityVersions, libdispatch's kernel firehose library and installed XNU headers. DTrace CTF tools are optional. The missing availability.pl observed above is supplied by the AvailabilityVersions dependency; it is not evidence that a random SDK version override fixes the environment.
 
 See [BUILD-ENVIRONMENT.md](BUILD-ENVIRONMENT.md) for the source references, KDK matching criteria and remaining verification checklist. The new read-only CI probe inventories installed KDKs and relevant SDK paths. No KDK has yet been confirmed on the runner, and no dependency versions have yet been pinned for this XNU tag.
+
+
+## Exact CI host and KDK result (2026-11-07)
+
+A subsequent probe established the exact runner identity:
+
+- Host: macOS 15.8.2, build 24H232
+- Virtual model: VirtualMac2,1
+- Platform token: VMA2MACOSAP
+- Xcode: 16.4 (16F6)
+- SDK: macOS 15.5 (24F74)
+- Apple Clang: 17.0.0
+- KDK inventory: none installed
+
+The expected filename pattern for a matching KDK is `KDK_15.8.2_24H232.kdk`, but this is not proof that Apple currently offers that package. The actual KDK must be obtained through an authorized Apple developer download and its System.kext metadata verified. The CI job deliberately does not use third-party KDK binaries or stored personal credentials.
+
+The runner's virtual platform token `VMA2MACOSAP` is not present in the pinned XNU public machine-configuration tree, so it is not accepted as a target configuration. The source has explicit Mac ARM64 configurations including T8112 and T8132; selecting one for a cross-build must be documented as a macOS reference target, not as Moto G60 support.
+
+AvailabilityVersions 143.3 builds and produces `availability.pl`. Full XNU header export has a separate DriverKit source-rule failure: the DriverKit makefile lists `IOTypes.h` as a local source, while the public source tree places it in `iokit/IOKit/IOTypes.h`. The workflow records this limitation. No XNU kernel artifact has been generated, and kernel build verification remains false.
