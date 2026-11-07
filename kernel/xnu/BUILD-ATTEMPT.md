@@ -94,3 +94,10 @@ AvailabilityVersions 143.3 builds and produces `availability.pl`. Full XNU heade
 The pinned XNU source tree locates `atm_internal.h` at `osfmk/atm/atm_internal.h`. Its direct XNU dependencies are `osfmk/atm/atm_types.h` and `libkern/os/refcnt.h`; the latter includes `libkern/os/refcnt_internal.h`. The dependency preparation script now stages those exact source-pinned headers into the corresponding Kernel.framework private-header directories before building `libfirehose_kernel`. This only addresses the observed missing-header chain; success of the dependency build is pending CI.
 
 The build workflow also stopped using `TARGET_CONFIGS` and the runner's `hw.target` token. The pinned XNU README documents `ARCH_CONFIGS` and `KERNEL_CONFIGS`; the selected reference configuration is `ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT`. This is not a Moto G60 configuration. A matching host KDK is still required, and the previously observed macOS 15.8.2 / build 24H232 runner had none installed. No XNU kernel artifact has yet been produced.
+
+
+## Firehose chunk header dependency traced (2026-11-07)
+
+After the ATM/refcount headers were staged, the pinned libdispatch `libfirehose_kernel` build advanced to `src/firehose/firehose_buffer.c` and failed on `<chunk_private.h>`. The exact pinned XNU source contains `libkern/firehose/chunk_private.h`. Its direct includes are `<sys/param.h>`, `firehose_types_private.h`, and `tracepoint_private.h`; the latter two are already staged beside it under the SDK's `usr/local/include/firehose` directory. The preparation script now stages this exact header from the pinned XNU submodule and verifies it is non-empty. This resolves the observed missing-file path only; the next CI run must determine whether further compile issues remain.
+
+Source: https://github.com/apple-oss-distributions/xnu/blob/8d741a5de7ff4191bf97d57b9f54c2f6d4a15585/libkern/firehose/chunk_private.h
