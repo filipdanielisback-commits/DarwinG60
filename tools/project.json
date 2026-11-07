@@ -1,0 +1,14 @@
+{
+  "name": "DarwinG60",
+  "version": "0.1.0-dev",
+  "device": {
+    "manufacturer": "Motorola",
+    "model": "Moto G60",
+    "codename": "hanoip"
+  },
+  "architecture": "arm64",
+  "status": "research-only",
+  "bootable": false,
+  "license": "MIT",
+  "notes": "Metadata describes project intent only; it does not assert device compatibility or working Darwin support."
+}
