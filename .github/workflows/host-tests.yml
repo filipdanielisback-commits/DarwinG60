@@ -39,5 +39,7 @@ jobs:
           name: darwing60-shell-preview
           path: build/darwing60-shell-demo.svg
           if-no-files-found: error
+      - name: Audit XNU source and build readiness
+        run: python tools/xnu_readiness.py
       - name: Run project checker
         run: python tools/dg60_check.py
