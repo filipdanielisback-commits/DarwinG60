@@ -62,8 +62,10 @@ test -f "$SDKROOT/usr/local/libexec/availability.pl"
 # The full upstream installhdrs target currently fails in the public source
 # tree's DriverKit header export (IOTypes.h is listed as a local source but only
 # exists under iokit/IOKit). For libdispatch's immediate dependency, stage the
-# exact XNU private atomic header family without modifying the upstream source.
-KERNEL_PRIVATE_OS="$SDKROOT/System/Library/Frameworks/Kernel.framework/PrivateHeaders/os"
+# exact XNU private atomic and CPU capability header families without modifying
+# the upstream source.
+KERNEL_PRIVATE="$SDKROOT/System/Library/Frameworks/Kernel.framework/PrivateHeaders"
+KERNEL_PRIVATE_OS="$KERNEL_PRIVATE/os"
 sudo mkdir -p "$KERNEL_PRIVATE_OS"
 for header in atomic_private.h atomic_private_arch.h atomic_private_impl.h; do
   source="$ROOT/kernel/xnu/upstream/libkern/os/$header"
@@ -71,11 +73,15 @@ for header in atomic_private.h atomic_private_arch.h atomic_private_impl.h; do
   sudo cp "$source" "$KERNEL_PRIVATE_OS/$header"
 done
 test -f "$KERNEL_PRIVATE_OS/atomic_private.h"
-sudo mkdir -p "$SDKROOT/System/Library/Frameworks/Kernel.framework/PrivateHeaders/machine"
-sudo mkdir -p "$SDKROOT/System/Library/Frameworks/Kernel.framework/PrivateHeaders/arm"
-sudo cp "$ROOT/kernel/xnu/upstream/osfmk/machine/cpu_number.h" "$SDKROOT/System/Library/Frameworks/Kernel.framework/PrivateHeaders/machine/cpu_number.h"
-sudo cp "$ROOT/kernel/xnu/upstream/osfmk/arm/cpu_number.h" "$SDKROOT/System/Library/Frameworks/Kernel.framework/PrivateHeaders/arm/cpu_number.h"
+sudo mkdir -p "$KERNEL_PRIVATE/machine" "$KERNEL_PRIVATE/arm"
+sudo cp "$ROOT/kernel/xnu/upstream/osfmk/machine/cpu_number.h" "$KERNEL_PRIVATE/machine/cpu_number.h"
+sudo cp "$ROOT/kernel/xnu/upstream/osfmk/arm/cpu_number.h" "$KERNEL_PRIVATE/arm/cpu_number.h"
+sudo cp "$ROOT/kernel/xnu/upstream/osfmk/machine/cpu_capabilities.h" "$KERNEL_PRIVATE/machine/cpu_capabilities.h"
+sudo cp "$ROOT/kernel/xnu/upstream/osfmk/arm/cpu_capabilities.h" "$KERNEL_PRIVATE/arm/cpu_capabilities.h"
+test -f "$KERNEL_PRIVATE/machine/cpu_capabilities.h"
+test -f "$KERNEL_PRIVATE/arm/cpu_capabilities.h"
 echo "xnu_private_atomic_headers=staged" >> "$EVIDENCE/dependency-prepare-status.txt"
+echo "xnu_private_cpu_capability_headers=staged_from_pinned_xnu_source" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "xnu_full_installhdrs=blocked_by_DriverKit_IOTypes.h_source_rule" >> "$EVIDENCE/dependency-prepare-status.txt"
 FIREHOSE_HEADERS="$SDKROOT/usr/local/include/firehose"
 sudo mkdir -p "$FIREHOSE_HEADERS"
