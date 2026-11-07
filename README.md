@@ -122,3 +122,18 @@ It models conceptual startup stages and validates caller-supplied illustrative m
 GitHub Actions runs the Python unit tests, validates the device profile, and runs the repository checker on pushes and pull requests. A green check means the host-side project checks passed, not that DarwinG60 boots on hardware.
 
 See [the device layer design](docs/device-layer.md) for details.
+
+
+## System information dashboard
+
+The integrated read-only dashboard combines device metadata, compatibility
+counts, implementation flags, and the conceptual ARM64 startup sequence:
+
+```sh
+python tools/system_info.py
+python tools/system_info.py --json
+python tools/system_info.py --check
+```
+
+It reads repository files only. It does not query or modify a connected phone.
+See [system information documentation](docs/system-information.md).
