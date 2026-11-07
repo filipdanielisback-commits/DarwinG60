@@ -80,8 +80,10 @@ echo "xnu_full_installhdrs=blocked_by_DriverKit_IOTypes.h_source_rule" >> "$EVID
 FIREHOSE_HEADERS="$SDKROOT/usr/local/include/firehose"
 sudo mkdir -p "$FIREHOSE_HEADERS"
 sudo cp "$ROOT/kernel/xnu/upstream/libkern/firehose/firehose_types_private.h" "$FIREHOSE_HEADERS/firehose_types_private.h"
+sudo cp "$ROOT/kernel/xnu/upstream/libkern/firehose/tracepoint_private.h" "$FIREHOSE_HEADERS/tracepoint_private.h"
 test -f "$FIREHOSE_HEADERS/firehose_types_private.h"
-echo "xnu_firehose_private_header=staged" >> "$EVIDENCE/dependency-prepare-status.txt"
+test -f "$FIREHOSE_HEADERS/tracepoint_private.h"
+echo "xnu_firehose_private_headers=staged_from_pinned_xnu_source" >> "$EVIDENCE/dependency-prepare-status.txt"
 
 # Build the kernel firehose library from the release-manifest-pinned libdispatch.
 DISPATCH_DST="$WORK/libdispatch-dst"
