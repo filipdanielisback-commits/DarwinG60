@@ -46,3 +46,18 @@ No kernel artifact was generated. The public macOS SDK did not provide the kerne
 - [Build-attempt artifact](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42374260258/artifacts/13575470511)
 
 This was a host-side compile attempt only. Nothing was installed, booted, or tested on a phone. It does not establish Moto G60 compatibility.
+
+
+## Second attempt with an explicit kernel-version override
+
+A second run set `RC_DARWIN_KERNEL_VERSION=24.0.0` as an experimental build metadata override. This value was used only to test whether the build could pass the missing-version lookup; it does not assert an exact iOS point-release mapping.
+
+The build passed the version lookup and compiled several bootstrap utilities, then stopped because the public SDK did not contain:
+
+```text
+usr/local/libexec/availability.pl
+```
+
+No kernel artifact was produced. The public SDK is not yet a confirmed compatible environment for this XNU source. A matching KDK or complete SDK with the required Apple build utility and headers remains necessary.
+
+Evidence: [second GitHub Actions run](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42374501882), artifact [xnu-arm64-override-build-attempt](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42374501882/artifacts/13575640445).
