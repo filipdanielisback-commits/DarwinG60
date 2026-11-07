@@ -167,3 +167,10 @@ Create starter metadata for a future device with
 `python tools/generate_device_profile.py --codename example-device --manufacturer Example --model "Example Phone"`.
 See [the generator guide](docs/porting/profile-generator.md). The tool creates
 research files only and does not add device support.
+
+## Hardware readiness report
+
+Run `python tools/hardware_readiness.py hanoip` to summarize six areas of
+device research and implementation gaps. See
+[hardware readiness documentation](docs/porting/hardware-readiness.md).
+The report reads repository metadata only and does not test hardware.
