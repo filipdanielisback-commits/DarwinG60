@@ -48,6 +48,7 @@ jobs:
 
   xnu-macos-environment:
     runs-on: macos-15
+    timeout-minutes: 35
     steps:
       - name: Check out repository and pinned XNU source
         uses: actions/checkout@v4
@@ -55,3 +56,35 @@ jobs:
           submodules: recursive
       - name: Probe macOS XNU build prerequisites
         run: python3 tools/xnu_macos_environment.py
+      - name: Attempt upstream XNU ARM64 DEVELOPMENT build
+        working-directory: kernel/xnu/upstream
+        shell: bash
+        run: |
+          evidence="$GITHUB_WORKSPACE/kernel/xnu/build-evidence"
+          mkdir -p "$evidence"
+          sdkroot="$(xcrun --sdk macosx --show-sdk-path)"
+          echo "SDKROOT=$sdkroot" > "$evidence/build-status.txt"
+          set +e
+          make SDKROOT="$sdkroot" ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT -j2 > "$evidence/build.log" 2>&1
+          status=$?
+          set -e
+          echo "make_exit_code=$status" >> "$evidence/build-status.txt"
+          artifact="$(find BUILD -type f -name 'kernel.development*' -print -quit 2>/dev/null || true)"
+          if [ -n "$artifact" ]; then
+            cp "$artifact" "$evidence/$(basename "$artifact")"
+            echo "artifact=$artifact" >> "$evidence/build-status.txt"
+          else
+            echo "artifact=NOT_FOUND" >> "$evidence/build-status.txt"
+          fi
+          if [ "$status" -eq 0 ] && [ -n "$artifact" ]; then
+            echo "result=success" >> "$evidence/build-status.txt"
+          else
+            echo "result=not_verified" >> "$evidence/build-status.txt"
+          fi
+      - name: Upload XNU ARM64 build attempt evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: xnu-arm64-build-attempt
+          path: kernel/xnu/build-evidence/
+          if-no-files-found: warn
