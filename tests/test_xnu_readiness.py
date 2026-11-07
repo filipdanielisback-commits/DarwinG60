@@ -118,8 +118,8 @@ class XNUReadinessTests(unittest.TestCase):
             upstream.mkdir()
             record = upstream / "DARWING60-BUILD-VERIFICATION.txt"
             record.write_text(
-                f"result=success\\ntag={EXPECTED_TAG}\\n"
-                f"tag_object={EXPECTED_TAG_OBJECT}\\nreviewed_by=test\\n",
+                f"result=success\ntag={EXPECTED_TAG}\n"
+                f"tag_object={EXPECTED_TAG_OBJECT}\nreviewed_by=test\n",
                 encoding="utf-8",
             )
             report = audit_xnu_readiness(root, environ={}, platform_name="Linux")
