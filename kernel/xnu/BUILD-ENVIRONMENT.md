@@ -150,3 +150,10 @@ Exact source references at commit `8d741a5de7ff4191bf97d57b9f54c2f6d4a15585`:
 The pinned XNU README documents `ARCH_CONFIGS` and `KERNEL_CONFIGS`, with the generic syntax `make SDKROOT=<sdkroot> ARCH_CONFIGS=<arch> KERNEL_CONFIGS=<variant>`. The workflow now uses `ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT`. It no longer passes the GitHub VM's `hw.target` token through the unsupported `TARGET_CONFIGS` variable. This is a generic ARM64 DEVELOPMENT reference build, not a Moto G60 target and not proof of support for any particular ARM64 SoC.
 
 The exact host-matching KDK remains mandatory for the Apple-Silicon external build path. The previously observed runner had macOS 15.8.2 build `24H232` and no matching KDK installed. The candidate package name is not evidence of availability; CI must still detect and verify an actual matching KDK before attempting the kernel build.
+
+
+## Firehose chunk header dependency traced (2026-11-07)
+
+After the ATM/refcount headers were staged, the pinned libdispatch `libfirehose_kernel` build advanced to `src/firehose/firehose_buffer.c` and failed on `<chunk_private.h>`. The exact pinned XNU source contains `libkern/firehose/chunk_private.h`. Its direct includes are `<sys/param.h>`, `firehose_types_private.h`, and `tracepoint_private.h`; the latter two are already staged beside it under the SDK's `usr/local/include/firehose` directory. The preparation script now stages this exact header from the pinned XNU submodule and verifies it is non-empty. This resolves the observed missing-file path only; the next CI run must determine whether further compile issues remain.
+
+Source: https://github.com/apple-oss-distributions/xnu/blob/8d741a5de7ff4191bf97d57b9f54c2f6d4a15585/libkern/firehose/chunk_private.h
