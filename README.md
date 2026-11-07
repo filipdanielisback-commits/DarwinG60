@@ -78,7 +78,7 @@ Apple, iOS, and Darwin are trademarks or products of their respective owners. Th
 
 ## Host-side prototype
 
-The repository now includes a harmless Python boot-menu simulation and repository checker. These run on a host environment and do not interact with a phone:
+The repository includes a harmless Python boot-menu simulation and repository checker. These run on a host environment and do not interact with a phone:
 
 ```sh
 python3 tools/menu_demo.py
@@ -87,7 +87,6 @@ python3 -m unittest discover -s tests -v
 ```
 
 The menu is a user-interface concept only. It cannot launch Android, load XNU, or change device boot settings. See [the menu design](docs/design/boot-menu.md) and [development guide](docs/development.md).
-
 
 ## Device research layer
 
@@ -106,6 +105,17 @@ python tools/device_info.py --check
 ```
 
 The report and tests validate metadata only; they do not probe or modify a handset.
+
+## ARM64 startup simulator
+
+A host-side educational model describes a hypothetical ARM64 startup sequence:
+
+```sh
+python tools/arm64_simulator.py
+python -m unittest discover -s tests -v
+```
+
+It models conceptual startup stages and validates caller-supplied illustrative memory ranges. It does not emulate ARM64 instructions, provide a real Moto G60 memory map, access firmware, or produce a bootable artifact. See [the simulator documentation](docs/arm64-simulator.md).
 
 ## Automated host checks
 
