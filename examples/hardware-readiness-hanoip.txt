@@ -1,0 +1,23 @@
+Illustrative DarwinG60 hardware readiness report: hanoip
+Profile status: research_only
+
+CPU — documented
+  Reference platform information exists; no DarwinG60 CPU bring-up implementation.
+
+Boot Firmware — unknown
+  Device-specific boot architecture research is incomplete.
+
+Display Gpu — unknown
+  Display initialization and GPU driver implementation are absent.
+
+Wireless — not_implemented
+  No DarwinG60 Wi-Fi or Bluetooth drivers exist.
+
+Power — unknown
+  Battery telemetry and charging integration are not implemented.
+
+Kernel Graphics — not_implemented
+  No Darwin/XNU kernel boot or graphics stack exists.
+
+Metadata assessment only. This is not a hardware test, driver test,
+kernel boot test, or compatibility certification.
