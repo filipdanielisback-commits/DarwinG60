@@ -199,3 +199,11 @@ A metadata-only driver matching/lifecycle model is available in
 `src/darwing60/driver_framework.py`. It supports synthetic test fixtures,
 matching by declared IDs/compatible strings, and explicitly simulated bindings.
 It performs no hardware I/O. See [driver framework design](docs/architecture/driver-framework.md).
+
+## Display and touch prototype
+
+A host-side synthetic interface model is available in
+`src/darwing60/display_touch.py`. It models display modes, synthetic frame
+metadata, and normalized multi-touch coordinate conversion. It does not
+render pixels or access a display/touch controller. See
+[prototype documentation](docs/architecture/display-touch-prototype.md).
