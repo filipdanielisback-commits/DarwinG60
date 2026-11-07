@@ -105,3 +105,25 @@ This is a better source-dependency baseline than taking the newest versions of t
 The KDK is **not** selected by matching its name to `xnu-11215.1.10`. The external-build guidance requires the KDK matching the exact macOS version/build of the Apple-Silicon build host. Therefore the workflow must first record `sw_vers -productVersion` and `sw_vers -buildVersion`, then inspect `/Library/Developer/KDKs` and verify the selected KDK's `System.kext/Info.plist:CFBundleVersion`. The GitHub-hosted runner currently has no confirmed KDK, so an exact package name cannot honestly be stated yet.
 
 Apple distributes KDKs through its developer downloads. The project will not fetch an authenticated package using stored personal credentials or use an unverified third-party binary. A KDK must be provided through an authorized, controlled build environment before the ARM64 build can be marked verified.
+
+
+## Observed GitHub-hosted macOS runner (2026-11-07)
+
+The CI probe identified the actual build host:
+
+- macOS 15.8.2, build `24H232`
+- Virtual model `VirtualMac2,1`
+- `hw.target=VMA2MACOSAP`
+- Xcode 16.4, build 16F6
+- Apple Clang 17.0.0
+- GNU Make 3.81
+- macOS SDK 15.5 (SDK build 24F74)
+- No KDK installed under `/Library/Developer/KDKs`
+
+The KDK package filename expected by Apple's usual naming pattern would be `KDK_15.8.2_24H232.kdk`. This is a **filename candidate only**: its availability and contents have not been verified against Apple's developer downloads. A matching KDK must be checked for `System.kext/Info.plist:CFBundleVersion` before use.
+
+The runner reports the virtual platform `VMA2MACOSAP`. That token does not appear in the pinned public XNU source's machine configuration files; the source does contain explicit Mac configurations such as `MASTER.arm64.t8112.MacOSX` and `MASTER.arm64.t8132.MacOSX`. Do not pass the virtual host token as a kernel target without proving that the source supports it. A host-side compile target must be selected explicitly from the pinned source's supported configurations.
+
+AvailabilityVersions 143.3 now builds successfully and stages `availability.pl`. The full XNU `installhdrs` path currently fails in the DriverKit export because its makefile expects `iokit/DriverKit/IOTypes.h` as a local source, while the public tree contains that file under `iokit/IOKit/IOTypes.h`. The workflow records this separately rather than claiming a complete XNU header installation.
+
+The KDK is still the decisive blocker for a complete, verified ARM64 build on this runner. No kernel artifact has been produced.
