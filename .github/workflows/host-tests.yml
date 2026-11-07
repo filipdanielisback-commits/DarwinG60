@@ -78,6 +78,24 @@ jobs:
           else
             echo "kdk_status=not_installed_build_attempt_uses_explicit_xnu_version" >> "$evidence/kernel-build-status.txt"
           fi
+          # The public XNU tag lists DriverKit headers in its export rules,
+          # but the corresponding standalone .h files are absent from the
+          # public iokit/DriverKit source directory (only .iig interfaces exist).
+          # The generic kernel build does not need to export the DriverKit SDK.
+          # Narrowly omit DriverKit from this CI runner's export traversal;
+          # leave the pinned upstream submodule and all other exports intact.
+          python3 - <<'PY'
+          from pathlib import Path
+          makefile = Path("iokit/Makefile")
+          source = makefile.read_text()
+          expected = "EXPINC_SUBDIRS = IOKit DriverKit Exclaves"
+          replacement = "EXPINC_SUBDIRS = IOKit Exclaves"
+          if source.count(expected) != 1:
+              raise SystemExit("Expected exactly one pinned XNU iokit export rule; refusing an ambiguous patch")
+          makefile.write_text(source.replace(expected, replacement))
+          print("ci_driverkit_header_export=skipped_for_generic_kernel_build")
+          PY
+          echo "driverkit_export=omitted_from_generic_kernel_header_export_only" >> "$evidence/kernel-build-status.txt"
           set +e
           make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT BUILD_LTO=0 -j2 > "$evidence/kernel-build.log" 2>&1
           status=$?
