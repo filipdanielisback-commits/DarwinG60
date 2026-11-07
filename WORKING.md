@@ -98,3 +98,13 @@ assessment, and validation plan. No second device is currently supported.
 See [porting overview](docs/porting/README.md) and
 [host-side command reference](docs/porting/commands.md).
 
+
+## Device compatibility database
+
+| Feature | Status | Notes |
+|---|---|---|
+| Multi-device compatibility catalogue | Host prototype | Reads per-device JSON metadata |
+| Compatibility matrix CLI | Host prototype | Reports documented/unknown/unimplemented states |
+| Second device profile | Planned | No additional device is validated |
+
+See [compatibility database documentation](docs/porting/compatibility-database.md).
