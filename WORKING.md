@@ -221,3 +221,15 @@ See [display/touch profile integration](docs/architecture/display-touch-profile-
 | Frame metadata events | Host prototype | Advances metadata counter only; no framebuffer or scanout |
 
 See [display event pipeline documentation](docs/architecture/display-event-pipeline.md).
+
+
+## Graphical compositor prototype
+
+| Feature | Status | Notes |
+|---|---|---|
+| Rectangular scene surfaces | Host prototype | Metadata for background, status bar, windows and overlays |
+| Z-order and visibility | Host prototype | Visible surfaces composed into ordered snapshots |
+| Touch hit testing | Host prototype | Synthetic touch selects the topmost surface |
+| Pixel rendering / GPU / framebuffer | Planned | No rasterization or physical display output |
+
+See [graphical compositor prototype](docs/architecture/graphical-compositor-prototype.md).
