@@ -1,0 +1,13 @@
+# Pinned upstream XNU source reference
+# This file pins the upstream source; it does not mean the source tree is vendored here.
+
+repository = "https://github.com/apple-oss-distributions/xnu"
+tag = "xnu-11215.1.10"
+tag_object = "d95cbeef34d1a9cca097b33d385db3b2aae1a755"
+source_archive = "https://github.com/apple-oss-distributions/xnu/archive/refs/tags/xnu-11215.1.10.tar.gz"
+license = "APPLE_LICENSE"
+license_name = "Apple Public Source License 2.0"
+source_scope = "iOS 18-era XNU source snapshot; exact iOS build mapping must be verified"
+import_status = "reference-pinned; source archive not vendored"
+build_status = "not attempted; no matching Apple SDK/KDK build environment available in this workflow"
+device_status = "not ported; Moto G60 platform support unverified"
