@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "device_codename": "hanoip",
+  "scope": "Source-observation ledger. Entries record what public source files say; they do not certify the physical bill of materials or DarwinG60 hardware support.",
+  "claims": [
+    {
+      "id": "display-kernel-panel-label",
+      "category": "display_touch",
+      "subject": "Kernel panel configuration label",
+      "finding": "Archived kernel DTS includes a Tianma/ILI7807S-labelled DSI panel configuration with 1080x2460 timing and dynamic 60/120 Hz modes.",
+      "status": "source_observed",
+      "confidence": "medium",
+      "sources": [
+        {
+          "kind": "device_tree",
+          "url": "https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/arch/arm64/boot/dts/qcom/dsi-panel-mot-tianma-ili7807s-678-1080x2460-video.dtsi",
+          "detail": "Panel definition filename and DTS timing/configuration."
+        },
+        {
+          "kind": "device_tree",
+          "url": "https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/arch/arm64/boot/dts/qcom/hanoi-panel.dtsi",
+          "detail": "Panel include and refresh-mode configuration."
+        }
+      ],
+      "limitations": [
+        "A DTS label is not the retail LCD module SKU.",
+        "The archived community kernel may not cover every regional or board revision."
+      ]
+    },
+    {
+      "id": "touch-kernel-ilitek-binding",
+      "category": "display_touch",
+      "subject": "Kernel touchscreen device-tree binding",
+      "finding": "Archived kernel DTS declares compatible = tchip,ilitek on an SPI bus.",
+      "status": "source_observed",
+      "confidence": "medium",
+      "sources": [
+        {
+          "kind": "device_tree",
+          "url": "https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/arch/arm64/boot/dts/qcom/sdmmagpie-hanoi-touchscreen.dtsi",
+          "detail": "Touchscreen compatible string and SPI node."
+        },
+        {
+          "kind": "kernel_driver",
+          "url": "https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/drivers/input/touchscreen/ilitek_v3_mmi/ilitek_v3_qcom.c",
+          "detail": "Kernel driver matches the tchip,ilitek compatible string."
+        }
+      ],
+      "limitations": [
+        "The compatible string identifies a driver family, not an exact controller IC part number.",
+        "The repository is an archived community kernel source."
+      ]
+    },
+    {
+      "id": "touch-android-nvt-interface",
+      "category": "display_touch",
+      "subject": "Android touchscreen gesture sysfs interface",
+      "finding": "Android gesture configuration references an NVT-labelled touchscreen sysfs path for gesture controls.",
+      "status": "source_observed",
+      "confidence": "medium",
+      "sources": [
+        {
+          "kind": "android_configuration",
+          "url": "https://github.com/bhawesh2002/android_device_motorola_hanoip/blob/default/lineagehw/touch/TouchscreenGesture.cpp",
+          "detail": "Single-tap gesture sysfs path."
+        },
+        {
+          "kind": "android_configuration",
+          "url": "https://github.com/bhawesh2002/android_device_motorola_hanoip/blob/default/BoardConfig.mk",
+          "detail": "Tap-to-wake sysfs path."
+        }
+      ],
+      "limitations": [
+        "A userspace sysfs node name does not independently prove the physical controller vendor or model.",
+        "The Android source and archived kernel DTS appear inconsistent; branch, revision, alias, and stale-config explanations have not been distinguished."
+      ]
+    },
+    {
+      "id": "touch-physical-controller-identity",
+      "category": "display_touch",
+      "subject": "Physical touchscreen controller identity",
+      "finding": "Not established. The ILITEK-family kernel binding and NVT-labelled Android gesture interface remain unreconciled.",
+      "status": "unresolved",
+      "confidence": "unknown",
+      "sources": [],
+      "limitations": [
+        "Do not select a physical vendor or exact IC model from these source observations alone."
+      ]
+    },
+    {
+      "id": "display-module-sku",
+      "category": "display_touch",
+      "subject": "Exact LCD module SKU and revision",
+      "finding": "Not established by the available DTS label.",
+      "status": "unresolved",
+      "confidence": "unknown",
+      "sources": [],
+      "limitations": [
+        "The panel configuration name is not a verified module part number."
+      ]
+    }
+  ]
+}
