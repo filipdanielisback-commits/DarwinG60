@@ -246,3 +246,14 @@ See [graphical compositor prototype](docs/architecture/graphical-compositor-prot
 | System app execution / hardware indicators | Planned | No OS process launch or physical device integration |
 
 See [system shell prototype](docs/architecture/system-shell-prototype.md).
+
+
+## Synthetic graphical renderer
+
+| Feature | Status | Notes |
+|---|---|---|
+| Host-side SVG rendering | Host prototype | Converts shell snapshots into standalone vector images |
+| Status bar, home tiles and panels | Host prototype | Renders simulated shell state with DarwinG60 styling |
+| GPU / framebuffer / physical panel output | Planned | SVG generation is not a device graphics driver |
+
+See [synthetic shell renderer documentation](docs/architecture/synthetic-shell-renderer.md).
