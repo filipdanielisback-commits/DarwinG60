@@ -59,31 +59,19 @@ fi
 sudo ditto "$AV_DST" "$SDKROOT"
 test -f "$SDKROOT/usr/local/libexec/availability.pl"
 
-# Export headers from the exact pinned XNU tree into the SDK.
-# 24.0.0 is the Darwin kernel version associated with the macOS 15.0 baseline.
-RC_DARWIN_KERNEL_VERSION=24.0.0 make -C "$ROOT/kernel/xnu/upstream" \
-  SDKROOT="$SDKROOT" ARCH_CONFIGS="X86_64 ARM64" installhdrs \
-  2>&1 | tee "$EVIDENCE/xnu-installhdrs.log"
-if [[ -d "$ROOT/kernel/xnu/upstream/BUILD/dst" ]]; then
-  sudo ditto "$ROOT/kernel/xnu/upstream/BUILD/dst" "$SDKROOT"
-fi
-echo "xnu_headers=installed" >> "$EVIDENCE/dependency-prepare-status.txt"
-
-# Build the kernel firehose library from the release-manifest-pinned libdispatch.
-DISPATCH_DST="$WORK/libdispatch-dst"
-xcodebuild -project "$DISPATCH/libdispatch.xcodeproj" \
-  -target libfirehose_kernel -configuration Release -sdk macosx \
-  ARCHS="arm64 arm64e" VALID_ARCHS="arm64 arm64e" \
-  PRODUCT_NAME=firehose_kernel DSTROOT="$DISPATCH_DST" install \
-  2>&1 | tee "$EVIDENCE/libdispatch-build.log"
-if [[ ! -d "$DISPATCH_DST/usr/local" ]]; then
-  echo "libdispatch build did not stage usr/local" >&2
-  exit 1
-fi
-sudo mkdir -p "$SDKROOT/usr/local"
-sudo ditto "$DISPATCH_DST/usr/local" "$SDKROOT/usr/local"
-echo "availabilityversions=installed" >> "$EVIDENCE/dependency-prepare-status.txt"
-echo "libdispatch=installed" >> "$EVIDENCE/dependency-prepare-status.txt"
+# The full upstream installhdrs target currently fails in the public source
+# tree's DriverKit header export (IOTypes.h is listed as a local source but only
+# exists under iokit/IOKit). For libdispatch's immediate dependency, stage the
+# exact XNU private atomic header family without modifying the upstream source.
+sudo mkdir -p "$SDKROOT/usr/local/include/os"
+for header in atomic_private.h atomic_private_arch.h atomic_private_impl.h; do
+  source="$ROOT/kernel/xnu/upstream/libkern/os/$header"
+  test -f "$source"
+  sudo cp "$source" "$SDKROOT/usr/local/include/os/$header"
+done
+test -f "$SDKROOT/usr/local/include/os/atomic_private.h"
+echo "xnu_private_atomic_headers=staged" >> "$EVIDENCE/dependency-prepare-status.txt"
+echo "xnu_full_installhdrs=blocked_by_DriverKit_IOTypes.h_source_rule" >> "$EVIDENCE/dependency-prepare-status.txt"
 
 # KDK must match the exact host macOS version/build. Never guess its name.
 HOST_VERSION="$(sw_vers -productVersion)"
