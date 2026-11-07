@@ -4,7 +4,7 @@ Date: 2026-11-07
 
 ## Result
 
-<badge>Not verified</badge>
+**Result: Not verified.**
 
 The upstream XNU source was checked out from the pinned submodule commit:
 
