@@ -26,3 +26,7 @@ A successful build of one layer does not prove that the layers above or below it
 The seven-category, per-device driver planning catalogue is documented in
 [Driver Architecture Registry](architecture/driver-registry.md). It is a
 metadata-only host tool and does not implement or test hardware drivers.
+
+The first host-side driver framework model is documented in
+[driver-framework.md](architecture/driver-framework.md). It is a metadata-only
+prototype and does not perform physical device discovery or hardware I/O.
