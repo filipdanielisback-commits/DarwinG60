@@ -35,10 +35,23 @@ Public Moto G60-family summaries conflict on display resolution:
 - 1080 × 2460 in one community device tree.
 - 1080 × 2400 in the TeamWin device tree.
 
-The exact panel model, panel revision, DSI timing set, touch-controller model,
-bus address, interrupt/reset wiring, and firmware requirements remain
-**unverified**. The moto-hanoip organization is archived (March 23, 2024),
-so its contents are historical references rather than active maintenance.
+A deeper review of an archived hanoip kernel tree found a Tianma/ILI7807S
+panel configuration labelled `mipi_mot_vid_tm_ili7807s_fhd_678`, with 1080 ×
+2460 timing and 60/120 Hz mode support. The exact retail LCD module SKU and
+revision are still unverified.
+
+The same tree declares `compatible = "tchip,ilitek"` on the QUPv3 SE6 SPI bus,
+and its matching driver identifies the ILITEK family. The exact ILITEK IC
+part number is not established. An Android `BoardConfig.mk` separately
+references an `NVT-ts` tap-to-wake sysfs path, conflicting with the ILITEK
+DTS declaration. This may reflect different revisions or stale configuration
+and must be resolved before treating the touch family as definitive.
+
+Sources: [panel DTS](https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/arch/arm64/boot/dts/qcom/hanoi-panel.dtsi), [panel mode definition](https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/arch/arm64/boot/dts/qcom/dsi-panel-mot-tianma-ili7807s-678-1080x2460-video.dtsi), [touch DTS](https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/arch/arm64/boot/dts/qcom/sdmmagpie-hanoi-touchscreen.dtsi), [matching ILITEK driver](https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/drivers/input/touchscreen/ilitek_v3_mmi/ilitek_v3_qcom.c), and [Android BoardConfig](https://github.com/bhawesh2002/android_device_motorola_hanoip/blob/default/BoardConfig.mk).
+
+The kernel source is an archived community tree, not an official Motorola
+hardware bill of materials. Its identifiers are source-level evidence only.
+The moto-hanoip organization is also archived (March 23, 2024).
 
 ## Next research evidence needed
 
