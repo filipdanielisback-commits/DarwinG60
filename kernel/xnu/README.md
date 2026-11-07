@@ -1,6 +1,6 @@
 # DarwinG60 XNU research track
 
-**Status: research scaffold only — no XNU code is vendored, built, ported, or bootable.**
+**Status: upstream XNU is pinned as a Git submodule; no DarwinG60 XNU build or device port is verified.**
 
 This directory tracks whether and how the public XNU kernel source could inform a future DarwinG60 kernel experiment.
 
@@ -38,7 +38,8 @@ A future independent DarwinG60 userspace and interface may borrow general operat
 
 | Area | Status |
 |---|---|
-| XNU source imported | No |
+| XNU upstream source pinned/importable | Yes — Git submodule at exact upstream commit |
+| XNU source materialized in a checkout | Requires submodule initialization |
 | XNU configured for hanoip | No |
 | XNU build verified | No |
 | XNU platform layer | Not implemented |
@@ -65,4 +66,6 @@ The project has selected the official Apple XNU tag `xnu-11215.1.10` as an **iOS
 
 The upstream Apple Public Source License 2.0 text is preserved in [APPLE_LICENSE](APPLE_LICENSE). Review and retain the applicable upstream notices for any source files before redistribution.
 
-**Import/build status:** only the license and source pin are committed here. The full upstream source archive has not been copied into this repository, and no XNU binary has been built. The available GitHub file-writing workflow cannot execute the required Apple build environment or import the entire upstream tree as a Git submodule. Do not mistake the pin for a vendored source tree.
+**Source import:** `upstream/` is a Git submodule pointing to the exact commit behind the selected Apple tag. Clone with `git clone --recurse-submodules` or run `git submodule update --init --recursive` after cloning to materialize the complete source tree. Git stores the upstream source as a pinned external repository reference rather than duplicating Apple's full history in DarwinG60.
+
+**Build status:** no XNU binary has been built. Apple's README for this exact tag documents a macOS SDK-based make build and uses `macosx.internal` in its examples. That is evidence of the expected Apple build environment, not proof that a public SDK on an arbitrary Mac is compatible. The current Ubuntu CI runner is not a verified XNU build host. A compatible public SDK/KDK and toolchain for this exact revision still need to be identified and tested.
