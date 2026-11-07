@@ -192,3 +192,10 @@ The initial seven-category hardware research dossier is available at
 It records sourced platform facts, conflicting specifications, unknown
 component identifiers, and driver research gaps. It does not claim working
 DarwinG60 drivers.
+
+## Host-side driver framework prototype
+
+A metadata-only driver matching/lifecycle model is available in
+`src/darwing60/driver_framework.py`. It supports synthetic test fixtures,
+matching by declared IDs/compatible strings, and explicitly simulated bindings.
+It performs no hardware I/O. See [driver framework design](docs/architecture/driver-framework.md).
