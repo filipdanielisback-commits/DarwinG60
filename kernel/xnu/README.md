@@ -48,6 +48,12 @@ A future independent DarwinG60 userspace and interface may borrow general operat
 | iOS 18 compatibility | Not available |
 | Research documentation | Started |
 
+## Build environment investigation
+
+See [BUILD-ENVIRONMENT.md](BUILD-ENVIRONMENT.md) for Apple's external-build prerequisites, KDK matching criteria, the two observed SDK blockers, and the evidence required before declaring a kernel build verified. The macOS CI probe inventories KDK and SDK dependency paths without modifying the host.
+
+See [BUILD-ATTEMPT.md](BUILD-ATTEMPT.md) for actual build attempt results. The current host is only a toolchain candidate; no compatible KDK/dependency set or successful kernel build has been verified.
+
 ## Upstream references
 
 - XNU source: https://github.com/apple-oss-distributions/xnu
