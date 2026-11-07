@@ -8,19 +8,25 @@
       "name": "Display and touchscreen",
       "scope": "Panel output, display modes, touch input and gesture events.",
       "status": "prototype",
-      "hardware": "Community device-tree summary describes IPS LCD/high refresh display; exact resolution conflicts across sources. Exact panel and touch controller unknown.",
+      "hardware": "Archived hanoip kernel DTS names a Tianma/ILI7807S display configuration at 1080x2460 with 60/120 Hz modes. Touch DTS uses compatible tchip,ilitek on SPI. Exact LCD module SKU and exact ILITEK controller IC remain unknown. Android BoardConfig separately references an NVT-ts sysfs node, a source-level discrepancy requiring resolution.",
       "darwing60_implementation": "Host-side synthetic display/touch interface prototype only; no physical display or touch driver.",
       "evidence": [
-        "S2: https://github.com/bhawesh2002/android_device_motorola_hanoip (touch configuration area; community source)",
-        "S3: https://github.com/motorola-sm6150-devs/device_motorola_hanoip",
+        "S2: https://github.com/bhawesh2002/android_device_motorola_hanoip (Android touch gesture HAL and BoardConfig)",
+        "S5: https://github.com/Dark-Matter7232/CosmicFresh-Hanoip (archived hanoip kernel source)",
+        "Panel DTS: https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/arch/arm64/boot/dts/qcom/hanoi-panel.dtsi",
+        "Panel mode definition: https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/arch/arm64/boot/dts/qcom/dsi-panel-mot-tianma-ili7807s-678-1080x2460-video.dtsi",
+        "Touch DTS: https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/arch/arm64/boot/dts/qcom/sdmmagpie-hanoi-touchscreen.dtsi",
+        "Touch driver match: https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/drivers/input/touchscreen/ilitek_v3_mmi/ilitek_v3_qcom.c",
+        "Android BoardConfig: https://github.com/bhawesh2002/android_device_motorola_hanoip/blob/default/BoardConfig.mk",
         "Host-side prototype: src/darwing60/display_touch.py; synthetic test fixture only."
       ],
       "tests": [],
       "gaps": [
-        "Resolve public resolution conflict: community tree says 1080x2460; TeamWin tree says 1080x2400.",
-        "Identify exact panel model/revision and DSI timings from device-specific evidence.",
-        "Identify exact touch-controller model, bus, interrupt/reset wiring and firmware requirements.",
-        "Establish source and firmware licensing/provenance before considering reuse.",
+        "Confirm the exact LCD module SKU/revision; the DTS panel label identifies a Tianma/ILI7807S configuration, not necessarily the glass/module part number.",
+        "Confirm whether the archived kernel DTS applies to the exact Moto G60 regional and board revision being targeted.",
+        "Resolve discrepancy: kernel DTS declares tchip,ilitek on SPI, while Android BoardConfig tap-to-wake path names NVT-ts; determine whether this reflects different revisions, branches, or stale configuration.",
+        "Identify exact ILITEK touch IC model/revision; compatible string tchip,ilitek is a driver-family identifier, not a precise chip part number.",
+        "Verify touch firmware provenance/licensing and required runtime interfaces before considering any reuse.",
         "No physical hardware validation or DarwinG60 kernel driver."
       ]
     },
