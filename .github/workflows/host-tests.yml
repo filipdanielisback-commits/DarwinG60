@@ -67,16 +67,14 @@ jobs:
             echo "A KDK matching this runner's exact macOS version/build is required; no matching KDK was found." | tee "$evidence/kernel-build-status.txt"
             exit 1
           fi
-          platform="$(sysctl -n hw.target 2>/dev/null || true)"
-          if [ -z "$platform" ]; then
-            echo "Cannot identify this Apple Silicon host's TARGET_CONFIGS platform from hw.target." | tee "$evidence/kernel-build-status.txt"
-            exit 1
-          fi
-          echo "target_platform=$platform" > "$evidence/kernel-build-status.txt"
+          # The pinned XNU README documents ARCH_CONFIGS and KERNEL_CONFIGS.
+          # Build its generic ARM64 DEVELOPMENT reference configuration; do not
+          # substitute the GitHub VM's hw.target token for an XNU config.
+          echo "build_target=ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT" > "$evidence/kernel-build-status.txt"
           echo "SDKROOT=$SDKROOT" >> "$evidence/kernel-build-status.txt"
           echo "KDKROOT=$KDK_ROOT" >> "$evidence/kernel-build-status.txt"
           set +e
-          make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 $platform" BUILD_LTO=0 -j2 > "$evidence/kernel-build.log" 2>&1
+          make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT BUILD_LTO=0 -j2 > "$evidence/kernel-build.log" 2>&1
           status=$?
           set -e
           echo "make_exit_code=$status" >> "$evidence/kernel-build-status.txt"
