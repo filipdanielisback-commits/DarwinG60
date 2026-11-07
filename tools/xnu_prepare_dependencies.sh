@@ -63,13 +63,14 @@ test -f "$SDKROOT/usr/local/libexec/availability.pl"
 # tree's DriverKit header export (IOTypes.h is listed as a local source but only
 # exists under iokit/IOKit). For libdispatch's immediate dependency, stage the
 # exact XNU private atomic header family without modifying the upstream source.
-sudo mkdir -p "$SDKROOT/usr/local/include/os"
+KERNEL_PRIVATE_OS="$SDKROOT/System/Library/Frameworks/Kernel.framework/PrivateHeaders/os"
+sudo mkdir -p "$KERNEL_PRIVATE_OS"
 for header in atomic_private.h atomic_private_arch.h atomic_private_impl.h; do
   source="$ROOT/kernel/xnu/upstream/libkern/os/$header"
   test -f "$source"
-  sudo cp "$source" "$SDKROOT/usr/local/include/os/$header"
+  sudo cp "$source" "$KERNEL_PRIVATE_OS/$header"
 done
-test -f "$SDKROOT/usr/local/include/os/atomic_private.h"
+test -f "$KERNEL_PRIVATE_OS/atomic_private.h"
 echo "xnu_private_atomic_headers=staged" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "xnu_full_installhdrs=blocked_by_DriverKit_IOTypes.h_source_rule" >> "$EVIDENCE/dependency-prepare-status.txt"
 
