@@ -102,9 +102,9 @@ jobs:
           # rather than treating an unverified prerequisite as a hard stop.
           set +e
           if [ -n "$KDK_ROOT" ]; then
-            make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j2 exporthdrs all > "$evidence/kernel-build.log" 2>&1
+            make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j1 exporthdrs all > "$evidence/kernel-build.log" 2>&1
           else
-            make SDKROOT="$SDKROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j2 exporthdrs all > "$evidence/kernel-build.log" 2>&1
+            make SDKROOT="$SDKROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j1 exporthdrs all > "$evidence/kernel-build.log" 2>&1
           fi
           status=$?
           set -e
