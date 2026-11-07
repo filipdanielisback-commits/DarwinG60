@@ -151,3 +151,10 @@ and [host-side porting commands](docs/porting/commands.md). The Moto G60 remains
 the primary target. Every additional device needs its own hardware research and
 compatibility assessment; UEFI must not be assumed to exist on every Android
 device. See [WORKING.md](WORKING.md) for the porting tracker.
+
+## Device compatibility database
+
+The host-side device catalogue can list profiles, inspect a device, display a
+component compatibility matrix, and check metadata consistency. See
+[compatibility database documentation](docs/porting/compatibility-database.md).
+It does not probe hardware or establish that a port works.
