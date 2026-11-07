@@ -129,22 +129,32 @@ echo "libdispatch=installed" >> "$EVIDENCE/dependency-prepare-status.txt"
 HOST_VERSION="$(sw_vers -productVersion)"
 HOST_BUILD="$(sw_vers -buildVersion)"
 KDK_ROOT=""
+KDK_INFO_PLIST=""
+KDK_BUNDLE_VERSION=""
 for candidate in /Library/Developer/KDKs/*.kdk; do
   [[ -d "$candidate" ]] || continue
   if [[ "$(basename "$candidate")" == *"$HOST_VERSION"*"$HOST_BUILD"* ]]; then
+    info_plist="$(find "$candidate" -path '*/System.kext/Info.plist' -print -quit)"
+    [[ -n "$info_plist" ]] || continue
+    bundle_version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$info_plist" 2>/dev/null || true)"
+    [[ -n "$bundle_version" ]] || continue
     KDK_ROOT="$candidate"
+    KDK_INFO_PLIST="$info_plist"
+    KDK_BUNDLE_VERSION="$bundle_version"
     break
   fi
 done
 if [[ -z "$KDK_ROOT" ]]; then
   echo "kdk_found=false" >> "$EVIDENCE/dependency-prepare-status.txt"
-  echo "No KDK matching host $HOST_VERSION build $HOST_BUILD is installed." \
+  echo "No KDK matching host $HOST_VERSION build $HOST_BUILD with readable System.kext CFBundleVersion metadata is installed." \
     | tee "$EVIDENCE/kdk-status.txt"
   exit 0
 fi
 
 echo "kdk_found=true" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "kdk_root=$KDK_ROOT" >> "$EVIDENCE/dependency-prepare-status.txt"
+echo "kdk_system_info_plist=$KDK_INFO_PLIST" >> "$EVIDENCE/dependency-prepare-status.txt"
+echo "kdk_system_bundle_version=$KDK_BUNDLE_VERSION" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "KDK_ROOT=$KDK_ROOT" >> "$GITHUB_ENV"
 echo "SDKROOT=$SDKROOT" >> "$GITHUB_ENV"
 echo "RC_DARWIN_KERNEL_VERSION=24.0.0" >> "$GITHUB_ENV"
