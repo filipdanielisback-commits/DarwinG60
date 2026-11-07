@@ -43,3 +43,25 @@ git submodule update --init --recursive
 ```
 
 A future successful build must retain its build log and output artifact under `kernel/xnu/`, then add `kernel/xnu/build-verification.json` with the pinned tag, tag-object ID, source commit, build host, SDK, exact build command, relative artifact/log paths, their SHA-256 hashes, and a reviewer. The audit verifies those files and hashes; it does not create the record or perform the build.
+
+
+## First macOS ARM64 build trial (2026-11-07)
+
+GitHub Actions checked out the exact upstream submodule commit `8d741a5de7ff4191bf97d57b9f54c2f6d4a15585` and probed this host:
+
+- macOS 15.8.2, ARM64
+- Xcode 16.4 (build 16F6)
+- Apple Clang 17.0.0
+- GNU Make 3.81
+- macOS SDK 15.5
+- iOS SDK 18.5 was installed, but this is not a substitute for a matching XNU KDK
+
+The trial command was:
+
+```sh
+make SDKROOT="$(xcrun --sdk macosx --show-sdk-path)" ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT -j2
+```
+
+It failed before compilation in `makedefs/MakeInc.kernel` because XNU could not obtain the kernel version from the public SDK/KDK and requested `RC_DARWIN_KERNEL_VERSION`. No kernel binary was generated. This establishes a macOS toolchain candidate, not a compatible build environment or successful kernel build.
+
+The log and status file are retained in the GitHub Actions artifact [xnu-arm64-build-attempt](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42374260258/artifacts/13575470511). The next build investigation must establish the correct kernel-version metadata and any matching KDK/header requirements for this exact XNU source. Do not infer an iOS point-release mapping from the tag name alone.
