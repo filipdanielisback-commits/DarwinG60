@@ -63,16 +63,21 @@ jobs:
         shell: bash
         run: |
           evidence="$GITHUB_WORKSPACE/kernel/xnu/build-evidence"
-          if ! grep -q '^kdk_found=true$' "$evidence/dependency-prepare-status.txt"; then
-            echo "A KDK matching this runner's exact macOS version/build is required; no matching KDK was found." | tee "$evidence/kernel-build-status.txt"
-            exit 1
-          fi
-          # The pinned XNU README documents ARCH_CONFIGS and KERNEL_CONFIGS.
-          # Build its generic ARM64 DEVELOPMENT reference configuration; do not
-          # substitute the GitHub VM's hw.target token for an XNU config.
+          # The pinned XNU README documents SDKROOT, ARCH_CONFIGS and
+          # KERNEL_CONFIGS as the kernel-build inputs. It also documents
+          # RC_DARWIN_KERNEL_VERSION as an override for the version normally
+          # discovered from System.kext in the SDK or KDK. Therefore a KDK is
+          # not an unconditional compile prerequisite for this source build.
+          # Keep KDK optional; it may be needed for KDK-specific debug symbols
+          # or later debugging workflows, not for this initial compile attempt.
           echo "build_target=ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT" > "$evidence/kernel-build-status.txt"
           echo "SDKROOT=$SDKROOT" >> "$evidence/kernel-build-status.txt"
-          echo "KDKROOT=$KDK_ROOT" >> "$evidence/kernel-build-status.txt"
+          echo "KDKROOT=${KDK_ROOT:-NOT_INSTALLED}" >> "$evidence/kernel-build-status.txt"
+          if [[ -n "$KDK_ROOT" ]]; then
+            echo "kdk_status=matching_kdk_detected" >> "$evidence/kernel-build-status.txt"
+          else
+            echo "kdk_status=not_installed_build_attempt_uses_explicit_xnu_version" >> "$evidence/kernel-build-status.txt"
+          fi
           set +e
           make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT BUILD_LTO=0 -j2 > "$evidence/kernel-build.log" 2>&1
           status=$?
