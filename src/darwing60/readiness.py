@@ -102,7 +102,7 @@ def assess_device(device_root: Path, codename: str) -> dict[str, Any]:
 
 def render_report(report: dict[str, Any]) -> str:
     lines = [
-        f"DarwinG60 hardware readiness report: {report['codename']}",
+        f"DarwinG60 Hardware readiness report: {report['codename']}",
         f"Profile status: {report['overall_status']}",
         "",
     ]
