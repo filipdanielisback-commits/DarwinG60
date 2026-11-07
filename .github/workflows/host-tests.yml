@@ -58,7 +58,42 @@ jobs:
         run: python3 tools/xnu_macos_environment.py
       - name: Prepare pinned XNU source dependencies and inspect matching KDK
         run: bash tools/xnu_prepare_dependencies.sh
+      - name: Preflight TrustCache headers and compiler configuration
+        id: xnu-preflight
+        working-directory: kernel/xnu/upstream
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$GITHUB_WORKSPACE/kernel/xnu/build-evidence"
+          mkdir -p "$evidence"
+          report="$evidence/xnu-preflight.txt"
+          : > "$report"
+          echo "xnu_tag=xnu-11215.1.10" >> "$report"
+          echo "sdkroot=$SDKROOT" >> "$report"
+          echo "clang_version=$(xcrun clang --version | head -n 1)" >> "$report"
+          echo "trustcache_header_search=SDK_KDK_pinned_source_and_selected_Xcode" >> "$report"
+          matches="$(find "$SDKROOT" /Library/Developer/KDKs /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs -path '*/TrustCache/API.h' -type f -print 2>/dev/null || true)"
+          source_matches="$(find . -path '*/TrustCache/API.h' -type f -print 2>/dev/null || true)"
+          {
+            echo "sdk_or_kdk_matches:"
+            if [[ -n "$matches" ]]; then printf '%s\n' "$matches"; else echo NONE; fi
+            echo "pinned_source_matches:"
+            if [[ -n "$source_matches" ]]; then printf '%s\n' "$source_matches"; else echo NONE; fi
+            echo "amfi_include_references:"
+            grep -R -n --include='*.h' --include='*.c' --include='*.cpp' 'TrustCache/API.h' bsd osfmk iokit 2>/dev/null | head -n 30 || true
+            echo "compiler_standard_and_warning_settings:"
+            grep -R -n -E --include='*.def' --include='*.mk' --include='Makefile' -- '-std=(gnu)?(c|gnu)?[0-9]+|Wpre-c11-compat|WARNFLAGS_STD|CFLAGS_STD|CFLAGS.*std' makedefs bsd osfmk libkern 2>/dev/null | head -n 100 || true
+          } >> "$report"
+          if [[ -n "$matches" || -n "$source_matches" ]]; then
+            echo "trustcache_found=true" >> "$GITHUB_OUTPUT"
+            echo "trustcache_preflight=found_candidate_header" >> "$report"
+          else
+            echo "trustcache_found=false" >> "$GITHUB_OUTPUT"
+            echo "trustcache_preflight=BLOCKED_no_matching_header_found" >> "$report"
+          fi
+          cat "$report"
       - name: Build XNU ARM64 DEVELOPMENT kernel
+        if: steps.xnu-preflight.outputs.trustcache_found == 'true'
         working-directory: kernel/xnu/upstream
         shell: bash
         run: |
@@ -150,6 +185,12 @@ jobs:
             echo "result=not_verified" >> "$evidence/kernel-build-status.txt"
             exit 1
           fi
+      - name: Record blocked kernel build
+        if: steps.xnu-preflight.outputs.trustcache_found != 'true'
+        shell: bash
+        run: |
+          echo "result=blocked_preflight_missing_TrustCache_API.h" >> "$GITHUB_WORKSPACE/kernel/xnu/build-evidence/kernel-build-status.txt"
+          echo "No full kernel compile was started: no TrustCache/API.h was found in the selected SDK, installed KDKs, or pinned XNU source. No replacement header was added." >> "$GITHUB_WORKSPACE/kernel/xnu/build-evidence/kernel-build-status.txt"
       - name: Upload XNU dependency and kernel build evidence
         uses: actions/upload-artifact@v4
         if: always()
