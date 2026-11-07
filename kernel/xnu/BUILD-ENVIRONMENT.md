@@ -168,3 +168,14 @@ The subsequent XNU kernel build step did **not** run. The runner inventory still
 The KDK is an Apple-distributed, separate download. Apple's documentation directs developers to download the KDK for the macOS version being debugged and links to the authenticated More Downloads page: https://developer.apple.com/documentation/apple-silicon/debugging-a-custom-kernel-extension and https://developer.apple.com/download/more/. The CI workflow will not use an unverified third-party mirror or store developer credentials. A matching kit must be supplied in an authorized macOS build environment and checked for its `System.kext` metadata before the kernel build can proceed.
 
 Evidence artifact from this run: [xnu-arm64-build-evidence](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42391235120/artifacts/13581053391).
+
+
+## DriverKit IOTypes public-source layout workaround (2026-11-07)
+
+The latest failed build (run #206) got past dependency preparation and invoked the XNU build. Its first recorded make failure was the DriverKit header export rule: `iokit/DriverKit/Makefile` lists `IOTypes.h` in `OTHER_HEADERS`, but the pinned public tag stores the shared header at `iokit/IOKit/IOTypes.h`. The pinned `iokit/IOKit/IOTypes.h` explicitly contains an `XNU_PLATFORM_DriverKit` conditional branch, so the CI preparation script now creates a **temporary relative symlink** at `iokit/DriverKit/IOTypes.h` pointing to that exact pinned header. This is an ephemeral build-workspace overlay; it does not modify or commit the upstream XNU submodule or fabricate a header.
+
+The next CI run must verify whether this resolves the export rule and expose the next build issue, if any. This workaround is narrow and source-verified, but is not yet validated by a successful kernel build. The previous run #206 still produced no kernel artifact.
+
+Exact pinned source references:
+- https://github.com/apple-oss-distributions/xnu/blob/xnu-11215.1.10/iokit/DriverKit/Makefile
+- https://github.com/apple-oss-distributions/xnu/blob/xnu-11215.1.10/iokit/IOKit/IOTypes.h
