@@ -29,5 +29,9 @@ jobs:
         run: python tools/compositor_demo.py
       - name: Demonstrate host system shell
         run: python tools/shell_demo.py
+      - name: Render synthetic shell SVG preview
+        run: python tools/render_shell.py
+      - name: Verify generated SVG preview
+        run: python -c "import xml.etree.ElementTree as ET; ET.parse('build/darwing60-shell-demo.svg')"
       - name: Run project checker
         run: python tools/dg60_check.py
