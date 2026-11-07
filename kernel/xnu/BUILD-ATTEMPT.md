@@ -61,3 +61,10 @@ usr/local/libexec/availability.pl
 No kernel artifact was produced. The public SDK is not yet a confirmed compatible environment for this XNU source. A matching KDK or complete SDK with the required Apple build utility and headers remains necessary.
 
 Evidence: [second GitHub Actions run](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42374501882), artifact [xnu-arm64-override-build-attempt](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42374501882/artifacts/13575640445).
+
+
+## Follow-up: missing external-build prerequisites
+
+Apple's external-build guidance identifies a matching host KDK for Apple-Silicon build hosts, plus AvailabilityVersions, libdispatch's kernel firehose library and installed XNU headers. DTrace CTF tools are optional. The missing availability.pl observed above is supplied by the AvailabilityVersions dependency; it is not evidence that a random SDK version override fixes the environment.
+
+See [BUILD-ENVIRONMENT.md](BUILD-ENVIRONMENT.md) for the source references, KDK matching criteria and remaining verification checklist. The new read-only CI probe inventories installed KDKs and relevant SDK paths. No KDK has yet been confirmed on the runner, and no dependency versions have yet been pinned for this XNU tag.
