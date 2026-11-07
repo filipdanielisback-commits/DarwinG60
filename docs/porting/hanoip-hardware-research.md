@@ -148,3 +148,27 @@ A deeper review of the archived `CosmicFresh-Hanoip` kernel repository found the
 - [`BoardConfig.mk`](https://github.com/bhawesh2002/android_device_motorola_hanoip/blob/default/BoardConfig.mk) points tap-to-wake at `/sys/class/touchscreen/NVT-ts/double_click`, which conflicts with the ILITEK SPI device-tree declaration. This discrepancy is recorded as unresolved rather than assuming either source is universally correct.
 
 The kernel repository is an archived community source, not an official Motorola hardware bill of materials. The evidence is therefore useful for source-level research but still needs correlation with the exact regional model and board revision. No kernel code, firmware, or Android blobs were copied into DarwinG60.
+
+
+## Android touch-path discrepancy review (2026-11-07)
+
+The Android device-tree repository was inspected beyond its directory listing:
+
+- `lineagehw/touch/TouchscreenGesture.cpp` defines a single-tap gesture node at `/sys/class/touchscreen/NVT-ts/single_click`.
+- `BoardConfig.mk` sets the tap-to-wake node to `/sys/class/touchscreen/NVT-ts/double_click`.
+- `lineagehw/touch/service.cpp` registers a LineageOS touchscreen-gesture HIDL service. This is a gesture-control service, not the low-level touchscreen bus driver.
+- `lineagehw/touch/Android.bp` builds that service from the gesture implementation and service entry point.
+
+These files confirm that this Android configuration expects an NVT-labelled sysfs interface for gesture control. The string `NVT-ts` is suggestive, but these user-space paths alone do **not** prove the physical controller vendor or exact IC model. In particular, they do not resolve the conflict with the archived kernel DTS that declares `compatible = "tchip,ilitek"` on SPI.
+
+Current interpretation:
+- **Panel configuration lead:** Tianma/ILI7807S-labelled DSI configuration, 1080 × 2460, dynamic 60/120 Hz in the archived kernel source; exact module SKU and applicability to each regional revision remain unverified.
+- **Touch interface evidence:** archived kernel DTS declares an ILITEK-family SPI binding; Android gesture configuration refers to an NVT-labelled sysfs node.
+- **Exact touch IC:** unresolved. Do not rename the hardware profile to Novatek or ILITEK as a definitive physical component until the source trees are reconciled against a device-specific primary source.
+- **DarwinG60:** no hardware driver was added; the existing interface remains synthetic and host-side.
+
+Additional source files:
+- [TouchscreenGesture.cpp](https://github.com/bhawesh2002/android_device_motorola_hanoip/blob/default/lineagehw/touch/TouchscreenGesture.cpp)
+- [service.cpp](https://github.com/bhawesh2002/android_device_motorola_hanoip/blob/default/lineagehw/touch/service.cpp)
+- [Android.bp](https://github.com/bhawesh2002/android_device_motorola_hanoip/blob/default/lineagehw/touch/Android.bp)
+- [BoardConfig.mk](https://github.com/bhawesh2002/android_device_motorola_hanoip/blob/default/BoardConfig.mk)
