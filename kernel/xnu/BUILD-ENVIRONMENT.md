@@ -127,3 +127,26 @@ The runner reports the virtual platform `VMA2MACOSAP`. That token does not appea
 AvailabilityVersions 143.3 now builds successfully and stages `availability.pl`. The full XNU `installhdrs` path currently fails in the DriverKit export because its makefile expects `iokit/DriverKit/IOTypes.h` as a local source, while the public tree contains that file under `iokit/IOKit/IOTypes.h`. The workflow records this separately rather than claiming a complete XNU header installation.
 
 The KDK is still the decisive blocker for a complete, verified ARM64 build on this runner. No kernel artifact has been produced.
+
+
+## ATM header dependency traced in the pinned source (2026-11-07)
+
+The previous `libfirehose_kernel` attempt stopped because `tracepoint_private.h` includes `<atm/atm_internal.h>` when `KERNEL` is defined. The exact pinned XNU tree places that header at `osfmk/atm/atm_internal.h` (not `libkern/atm`). Its direct XNU header dependencies are:
+
+- `osfmk/atm/atm_types.h`
+- `libkern/os/refcnt.h`
+- `libkern/os/refcnt_internal.h` (included by `refcnt.h`)
+
+The dependency-preparation script now stages these exact files from the checked-out XNU submodule into the matching `Kernel.framework/PrivateHeaders/atm` and `Kernel.framework/PrivateHeaders/os` directories. It checks each file is non-empty and records the staging status. This is a narrow, source-pinned workaround for the currently failing public-tree `installhdrs` path; it is not a claim that the complete XNU header export has succeeded.
+
+Exact source references at commit `8d741a5de7ff4191bf97d57b9f54c2f6d4a15585`:
+- https://github.com/apple-oss-distributions/xnu/blob/8d741a5de7ff4191bf97d57b9f54c2f6d4a15585/osfmk/atm/atm_internal.h
+- https://github.com/apple-oss-distributions/xnu/blob/8d741a5de7ff4191bf97d57b9f54c2f6d4a15585/osfmk/atm/atm_types.h
+- https://github.com/apple-oss-distributions/xnu/blob/8d741a5de7ff4191bf97d57b9f54c2f6d4a15585/libkern/os/refcnt.h
+- https://github.com/apple-oss-distributions/xnu/blob/8d741a5de7ff4191bf97d57b9f54c2f6d4a15585/libkern/os/refcnt_internal.h
+
+## ARM64 reference build configuration
+
+The pinned XNU README documents `ARCH_CONFIGS` and `KERNEL_CONFIGS`, with the generic syntax `make SDKROOT=<sdkroot> ARCH_CONFIGS=<arch> KERNEL_CONFIGS=<variant>`. The workflow now uses `ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT`. It no longer passes the GitHub VM's `hw.target` token through the unsupported `TARGET_CONFIGS` variable. This is a generic ARM64 DEVELOPMENT reference build, not a Moto G60 target and not proof of support for any particular ARM64 SoC.
+
+The exact host-matching KDK remains mandatory for the Apple-Silicon external build path. The previously observed runner had macOS 15.8.2 build `24H232` and no matching KDK installed. The candidate package name is not evidence of availability; CI must still detect and verify an actual matching KDK before attempting the kernel build.
