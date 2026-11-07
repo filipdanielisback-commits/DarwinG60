@@ -45,3 +45,13 @@ jobs:
         run: python tools/xnu_readiness.py
       - name: Run project checker
         run: python tools/dg60_check.py
+
+  xnu-macos-environment:
+    runs-on: macos-14
+    steps:
+      - name: Check out repository and pinned XNU source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Probe macOS XNU build prerequisites
+        run: python3 tools/xnu_macos_environment.py
