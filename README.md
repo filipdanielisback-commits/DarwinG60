@@ -184,3 +184,11 @@ and storage. Inspect the Moto G60 registry with
 `python tools/driver_registry.py check hanoip`. See
 [driver registry documentation](docs/architecture/driver-registry.md).
 These are planning records, not working drivers or verified hardware support.
+
+## Moto G60 hardware research
+
+The initial seven-category hardware research dossier is available at
+[devices/hanoip hardware research](docs/porting/hanoip-hardware-research.md).
+It records sourced platform facts, conflicting specifications, unknown
+component identifiers, and driver research gaps. It does not claim working
+DarwinG60 drivers.
