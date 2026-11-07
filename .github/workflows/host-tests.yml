@@ -47,7 +47,7 @@ jobs:
         run: python tools/dg60_check.py
 
   xnu-macos-environment:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Check out repository and pinned XNU source
         uses: actions/checkout@v4
