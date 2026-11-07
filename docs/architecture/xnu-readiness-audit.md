@@ -65,3 +65,14 @@ make SDKROOT="$(xcrun --sdk macosx --show-sdk-path)" ARCH_CONFIGS=ARM64 KERNEL_C
 It failed before compilation in `makedefs/MakeInc.kernel` because XNU could not obtain the kernel version from the public SDK/KDK and requested `RC_DARWIN_KERNEL_VERSION`. No kernel binary was generated. This establishes a macOS toolchain candidate, not a compatible build environment or successful kernel build.
 
 The log and status file are retained in the GitHub Actions artifact [xnu-arm64-build-attempt](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42374260258/artifacts/13575470511). The next build investigation must establish the correct kernel-version metadata and any matching KDK/header requirements for this exact XNU source. Do not infer an iOS point-release mapping from the tag name alone.
+
+
+### Second build attempt with an explicit version override
+
+A second attempt set `RC_DARWIN_KERNEL_VERSION=24.0.0` (an experimental build metadata override, not a claim that this tag maps to a particular iOS point release). It advanced beyond the kernel-version lookup and compiled several setup tools, but then stopped because the public macOS SDK did not contain:
+
+```text
+usr/local/libexec/availability.pl
+```
+
+No kernel binary was produced. The public SDK is therefore still not a verified compatible build environment for this XNU revision. A matching KDK or SDK containing the required Apple build utilities/headers must be identified before another build attempt.
