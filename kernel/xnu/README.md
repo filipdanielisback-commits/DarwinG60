@@ -39,7 +39,8 @@ A future independent DarwinG60 userspace and interface may borrow general operat
 | Area | Status |
 |---|---|
 | XNU upstream source pinned/importable | Yes — Git submodule at exact upstream commit |
-| XNU source materialized in a checkout | Requires submodule initialization |
+| XNU source materialized in CI | Yes — recursive submodule checkout |
+| XNU source materialized in a local checkout | Run `git submodule update --init --recursive` |
 | XNU configured for hanoip | No |
 | XNU build verified | No |
 | XNU platform layer | Not implemented |
@@ -68,4 +69,4 @@ The upstream Apple Public Source License 2.0 text is preserved in [APPLE_LICENSE
 
 **Source import:** `upstream/` is a Git submodule pointing to the exact commit behind the selected Apple tag. Clone with `git clone --recurse-submodules` or run `git submodule update --init --recursive` after cloning to materialize the complete source tree. Git stores the upstream source as a pinned external repository reference rather than duplicating Apple's full history in DarwinG60.
 
-**Build status:** no XNU binary has been built. Apple's README for this exact tag documents a macOS SDK-based make build and uses `macosx.internal` in its examples. That is evidence of the expected Apple build environment, not proof that a public SDK on an arbitrary Mac is compatible. The current Ubuntu CI runner is not a verified XNU build host. A compatible public SDK/KDK and toolchain for this exact revision still need to be identified and tested.
+**Build status:** no XNU binary has been built. Apple's README for this exact tag documents a macOS SDK-based make build and uses `macosx.internal` in its examples. That is evidence of the expected Apple build environment, not proof that a public SDK on an arbitrary Mac is compatible. The current Ubuntu CI runner is not a verified XNU build host. A macOS CI probe now inventories Xcode, SDKs, Clang, make and the selected SDK path. It can identify a toolchain candidate, but a compatible public SDK/KDK and toolchain for this exact revision still need to be tested.
