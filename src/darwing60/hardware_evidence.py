@@ -86,4 +86,4 @@ def build_report(data: dict[str, Any] | None = None) -> str:
         lines.append(f"  Sources: {len(claim.get('sources', []))}")
     unresolved = sum(1 for claim in claims if claim.get("status") == "unresolved")
     lines.extend(["", f"Unresolved claims: {unresolved}"])
-    return "\\n".join(lines)
+    return "\n".join(lines)
