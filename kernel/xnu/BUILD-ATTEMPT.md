@@ -87,3 +87,10 @@ The expected filename pattern for a matching KDK is `KDK_15.8.2_24H232.kdk`, but
 The runner's virtual platform token `VMA2MACOSAP` is not present in the pinned XNU public machine-configuration tree, so it is not accepted as a target configuration. The source has explicit Mac ARM64 configurations including T8112 and T8132; selecting one for a cross-build must be documented as a macOS reference target, not as Moto G60 support.
 
 AvailabilityVersions 143.3 builds and produces `availability.pl`. Full XNU header export has a separate DriverKit source-rule failure: the DriverKit makefile lists `IOTypes.h` as a local source, while the public source tree places it in `iokit/IOKit/IOTypes.h`. The workflow records this limitation. No XNU kernel artifact has been generated, and kernel build verification remains false.
+
+
+## Follow-up: exact ATM header dependency and documented ARM64 configuration (2026-11-07)
+
+The pinned XNU source tree locates `atm_internal.h` at `osfmk/atm/atm_internal.h`. Its direct XNU dependencies are `osfmk/atm/atm_types.h` and `libkern/os/refcnt.h`; the latter includes `libkern/os/refcnt_internal.h`. The dependency preparation script now stages those exact source-pinned headers into the corresponding Kernel.framework private-header directories before building `libfirehose_kernel`. This only addresses the observed missing-header chain; success of the dependency build is pending CI.
+
+The build workflow also stopped using `TARGET_CONFIGS` and the runner's `hw.target` token. The pinned XNU README documents `ARCH_CONFIGS` and `KERNEL_CONFIGS`; the selected reference configuration is `ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT`. This is not a Moto G60 configuration. A matching host KDK is still required, and the previously observed macOS 15.8.2 / build 24H232 runner had none installed. No XNU kernel artifact has yet been produced.
