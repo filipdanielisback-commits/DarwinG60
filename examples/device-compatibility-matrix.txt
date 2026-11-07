@@ -1,0 +1,13 @@
+DarwinG60 device compatibility matrix
+Device: hanoip (Moto G60)
+Overall status: research_only
+
+ARM64 CPU execution environment: documented
+Adreno 618 graphics: documented
+Display controller and panel initialization: unknown
+Interrupt controller and timer configuration: unknown
+Storage and partition access: unknown
+Touchscreen, audio, Wi-Fi, Bluetooth, camera and sensors: not_implemented
+Darwin/XNU kernel boot on Moto G60: not_implemented
+
+Metadata report only. No hardware compatibility is implied.
