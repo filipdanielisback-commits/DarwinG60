@@ -77,6 +77,11 @@ sudo cp "$ROOT/kernel/xnu/upstream/osfmk/machine/cpu_number.h" "$SDKROOT/System/
 sudo cp "$ROOT/kernel/xnu/upstream/osfmk/arm/cpu_number.h" "$SDKROOT/System/Library/Frameworks/Kernel.framework/PrivateHeaders/arm/cpu_number.h"
 echo "xnu_private_atomic_headers=staged" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "xnu_full_installhdrs=blocked_by_DriverKit_IOTypes.h_source_rule" >> "$EVIDENCE/dependency-prepare-status.txt"
+FIREHOSE_HEADERS="$SDKROOT/usr/local/include/firehose"
+sudo mkdir -p "$FIREHOSE_HEADERS"
+sudo cp "$ROOT/kernel/xnu/upstream/libkern/firehose/firehose_types_private.h" "$FIREHOSE_HEADERS/firehose_types_private.h"
+test -f "$FIREHOSE_HEADERS/firehose_types_private.h"
+echo "xnu_firehose_private_header=staged" >> "$EVIDENCE/dependency-prepare-status.txt"
 
 # Build the kernel firehose library from the release-manifest-pinned libdispatch.
 DISPATCH_DST="$WORK/libdispatch-dst"
