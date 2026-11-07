@@ -30,3 +30,9 @@ metadata-only host tool and does not implement or test hardware drivers.
 The first host-side driver framework model is documented in
 [driver-framework.md](architecture/driver-framework.md). It is a metadata-only
 prototype and does not perform physical device discovery or hardware I/O.
+
+## Display and touch prototype
+
+See [display-touch-prototype.md](architecture/display-touch-prototype.md) for
+the host-side synthetic display-mode and touch-event model. It is not a
+hardware driver and performs no physical device I/O.
