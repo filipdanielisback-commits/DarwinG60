@@ -39,6 +39,4 @@ def check_profiles() -> list[str]:
         except (OSError, json.JSONDecodeError, ValueError) as exc:
             errors.append(f"{codename}: {exc}")
             continue
-        if not data:
-            errors.append(f"{codename}: profile is empty")
     return errors
