@@ -1,0 +1,12 @@
+DarwinG60 driver registry: hanoip
+
+Display and touchscreen — research
+GPU — research
+Wi-Fi and Bluetooth — planned
+Battery and charging — planned
+Audio — planned
+Sensors — planned
+Storage — planned
+
+All seven entries are planning metadata. DarwinG60 has no functional device
+drivers or verified hardware support in these categories.
