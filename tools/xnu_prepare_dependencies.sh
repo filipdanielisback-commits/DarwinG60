@@ -9,6 +9,21 @@ SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
 EVIDENCE="$ROOT/kernel/xnu/build-evidence"
 mkdir -p "$WORK" "$EVIDENCE"
 
+# The pinned public XNU DriverKit export list names IOTypes.h as a local
+# source, but this release stores the shared header under iokit/IOKit. The
+# header itself contains an XNU_PLATFORM_DriverKit branch. Add a CI-only
+# relative symlink so the upstream export rule resolves the intended header;
+# do not modify or commit the upstream submodule.
+DRIVERKIT_IOTYPES="$ROOT/kernel/xnu/upstream/iokit/DriverKit/IOTypes.h"
+IOKIT_IOTYPES="$ROOT/kernel/xnu/upstream/iokit/IOKit/IOTypes.h"
+if [[ ! -e "$DRIVERKIT_IOTYPES" ]]; then
+  test -s "$IOKIT_IOTYPES"
+  grep -Fq '#else /* !XNU_PLATFORM_DriverKit */' "$IOKIT_IOTYPES"
+  ln -s ../IOKit/IOTypes.h "$DRIVERKIT_IOTYPES"
+fi
+test -s "$DRIVERKIT_IOTYPES"
+echo "driverkit_iotypes_ci_overlay=relative_symlink_to_pinned_iokit_header" >> "$EVIDENCE/dependency-prepare-status.txt"
+
 clone_pin() {
   local repo="$1" tag="$2" commit="$3" dir="$4"
   if [[ ! -d "$dir/.git" ]]; then
