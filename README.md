@@ -87,3 +87,28 @@ python3 -m unittest discover -s tests -v
 ```
 
 The menu is a user-interface concept only. It cannot launch Android, load XNU, or change device boot settings. See [the menu design](docs/design/boot-menu.md) and [development guide](docs/development.md).
+
+
+## Device research layer
+
+The first structured target profile is stored in `devices/hanoip/`:
+
+- `device.json` records published Moto G60 hardware information.
+- `compatibility.json` separates documented hardware facts from components that DarwinG60 has not implemented.
+- `sources.md` records the references and confidence limits.
+
+A read-only Python report tool is available:
+
+```sh
+python tools/device_info.py
+python tools/device_info.py --json
+python tools/device_info.py --check
+```
+
+The report and tests validate metadata only; they do not probe or modify a handset.
+
+## Automated host checks
+
+GitHub Actions runs the Python unit tests, validates the device profile, and runs the repository checker on pushes and pull requests. A green check means the host-side project checks passed, not that DarwinG60 boots on hardware.
+
+See [the device layer design](docs/device-layer.md) for details.
