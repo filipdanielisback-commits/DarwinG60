@@ -158,3 +158,12 @@ The host-side device catalogue can list profiles, inspect a device, display a
 component compatibility matrix, and check metadata consistency. See
 [compatibility database documentation](docs/porting/compatibility-database.md).
 It does not probe hardware or establish that a port works.
+
+
+
+## Device profile generator
+
+Create starter metadata for a future device with
+`python tools/generate_device_profile.py --codename example-device --manufacturer Example --model "Example Phone"`.
+See [the generator guide](docs/porting/profile-generator.md). The tool creates
+research files only and does not add device support.
