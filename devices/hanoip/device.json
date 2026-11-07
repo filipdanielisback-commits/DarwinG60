@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "project": "DarwinG60",
+  "device": {
+    "manufacturer": "Motorola",
+    "marketing_name": "Moto G60",
+    "shared_device_family": ["Moto G40 Fusion", "Moto G60"],
+    "codename": "hanoip",
+    "codename_confidence": "documented_by_community_device_trees",
+    "model_numbers": [],
+    "release_year": 2021
+  },
+  "platform": {
+    "soc_marketing_name": "Qualcomm Snapdragon 732G",
+    "cpu": "Octa-core Kryo 470 (2x up to 2.3 GHz + 6x up to 1.8 GHz)",
+    "gpu": "Qualcomm Adreno 618",
+    "manufacturing_process_nm": 8,
+    "architecture": "arm64",
+    "soc_internal_id": null,
+    "soc_internal_id_note": "Not pinned here; verify against authoritative platform documentation before using in low-level code."
+  },
+  "memory_and_storage": {
+    "ram_gb_options": [4, 6],
+    "storage_gb_options": [64, 128],
+    "expandable_storage": "microSD"
+  },
+  "display": {
+    "diagonal_inches": 6.8,
+    "resolution_pixels": [1080, 2460],
+    "panel": "IPS LCD",
+    "refresh_rate_hz": 120
+  },
+  "battery": {
+    "capacity_mah_typical": 6000
+  },
+  "software": {
+    "shipped_android_major_version": 11,
+    "darwing60_support": "research_only"
+  },
+  "research_status": {
+    "hardware_probed_by_darwing60": false,
+    "bootloader_implemented": false,
+    "xnu_kernel_ported": false,
+    "device_drivers_implemented": false,
+    "bootable_image_available": false
+  },
+  "notes": [
+    "The hanoip codename is used by community device trees for the Moto G40 Fusion and Moto G60 family.",
+    "Regional variants can differ; this profile records common published specifications, not a measurement of a particular handset.",
+    "This file is descriptive metadata only. It does not configure, unlock, flash, or modify a phone."
+  ]
+}
