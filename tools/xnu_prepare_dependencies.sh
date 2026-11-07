@@ -143,6 +143,11 @@ test -s "$SDKROOT/usr/local/lib/kernel/libfirehose_kernel.a"
 echo "availabilityversions=installed" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "libdispatch=installed" >> "$EVIDENCE/dependency-prepare-status.txt"
 
+# Persist the SDK and pinned XNU version for subsequent workflow steps
+# regardless of whether an optional matching KDK is installed.
+echo "SDKROOT=$SDKROOT" >> "$GITHUB_ENV"
+echo "RC_DARWIN_KERNEL_VERSION=24.0.0" >> "$GITHUB_ENV"
+
 # KDK must match the exact host macOS version/build. Never guess its name.
 HOST_VERSION="$(sw_vers -productVersion)"
 HOST_BUILD="$(sw_vers -buildVersion)"
@@ -174,5 +179,3 @@ echo "kdk_root=$KDK_ROOT" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "kdk_system_info_plist=$KDK_INFO_PLIST" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "kdk_system_bundle_version=$KDK_BUNDLE_VERSION" >> "$EVIDENCE/dependency-prepare-status.txt"
 echo "KDK_ROOT=$KDK_ROOT" >> "$GITHUB_ENV"
-echo "SDKROOT=$SDKROOT" >> "$GITHUB_ENV"
-echo "RC_DARWIN_KERNEL_VERSION=24.0.0" >> "$GITHUB_ENV"
