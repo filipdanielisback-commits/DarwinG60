@@ -137,3 +137,9 @@ python tools/system_info.py --check
 
 It reads repository files only. It does not query or modify a connected phone.
 See [system information documentation](docs/system-information.md).
+
+## Feature tracker and core architecture
+
+See [WORKING.md](WORKING.md) for the public feature tracker, including planned Wi-Fi, battery reporting, graphical interface, status bar, Control Center, kernel, and Moto G60 hardware support. The current kernel catalogue and service registry are host-side architecture prototypes only; they are not a running kernel or hardware services.
+
+Core design notes: [kernel subsystem architecture](docs/architecture/core-subsystems.md) and [service architecture](docs/services.md).
