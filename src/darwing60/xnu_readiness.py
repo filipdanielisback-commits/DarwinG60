@@ -17,6 +17,7 @@ XNU_ROOT = REPOSITORY_ROOT / "kernel" / "xnu"
 LOCK_PATH = XNU_ROOT / "UPSTREAM.lock"
 EXPECTED_TAG = "xnu-11215.1.10"
 EXPECTED_TAG_OBJECT = "d95cbeef34d1a9cca097b33d385db3b2aae1a755"
+EXPECTED_SOURCE_COMMIT = "8d741a5de7ff4191bf97d57b9f54c2f6d4a15585"
 SOURCE_TREE = XNU_ROOT / "upstream"
 SOURCE_SENTINELS = ("README.md", "osfmk", "bsd", "iokit", "APPLE_LICENSE")
 
@@ -72,6 +73,8 @@ def audit_xnu_readiness(
         errors.append(f"Expected pinned tag {EXPECTED_TAG}.")
     if lock.get("tag_object") != EXPECTED_TAG_OBJECT:
         errors.append("Pinned tag object does not match the reviewed baseline.")
+    if lock.get("source_commit") != EXPECTED_SOURCE_COMMIT:
+        errors.append("Pinned upstream source commit does not match the reviewed tag target.")
     if lock.get("license") != "APPLE_LICENSE":
         errors.append("Lock file does not point to the expected upstream license.")
     license_present = (xnu_root / "APPLE_LICENSE").is_file()
@@ -82,7 +85,9 @@ def audit_xnu_readiness(
     missing_source_items = [
         item for item in SOURCE_SENTINELS if not (source_root / item).exists()
     ]
-    source_imported = not missing_source_items
+    source_imported = not missing_source_items and (source_root / ".git").exists()
+    if not (source_root / ".git").exists():
+        missing_source_items.append(".git submodule metadata (initialize submodules)")
 
     required_commands = ("make", "clang", "xcrun", "xcodebuild")
     commands = {name: command_lookup(name) is not None for name in required_commands}
@@ -109,6 +114,7 @@ def audit_xnu_readiness(
             "result=success" in record_text.splitlines()
             and f"tag={EXPECTED_TAG}" in record_text.splitlines()
             and f"tag_object={EXPECTED_TAG_OBJECT}" in record_text.splitlines()
+            and f"source_commit={EXPECTED_SOURCE_COMMIT}" in record_text.splitlines()
             and "reviewed_by=" in record_text
         )
 
@@ -119,6 +125,7 @@ def audit_xnu_readiness(
             "repository": lock.get("repository"),
             "tag": lock.get("tag"),
             "tag_object": lock.get("tag_object"),
+            "source_commit": lock.get("source_commit"),
             "source_archive": lock.get("source_archive"),
             "license_file_present": license_present,
             "lock_valid": not errors,
