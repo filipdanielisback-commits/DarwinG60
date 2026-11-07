@@ -25,5 +25,7 @@ jobs:
         run: python tools/display_touch_profile.py
       - name: Demonstrate synthetic display event pipeline
         run: python tools/display_event_demo.py
+      - name: Demonstrate host graphical compositor
+        run: python tools/compositor_demo.py
       - name: Run project checker
         run: python tools/dg60_check.py
