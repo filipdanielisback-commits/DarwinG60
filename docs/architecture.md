@@ -20,3 +20,9 @@ A successful build of one layer does not prove that the layers above or below it
 - Keep original project code separate from imported third-party code.
 - Record assumptions and unknowns explicitly.
 - Do not describe a component as implemented until there is a reproducible test result.
+
+## Driver architecture registry
+
+The seven-category, per-device driver planning catalogue is documented in
+[Driver Architecture Registry](architecture/driver-registry.md). It is a
+metadata-only host tool and does not implement or test hardware drivers.
