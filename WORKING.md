@@ -163,3 +163,13 @@ See [driver registry documentation](docs/architecture/driver-registry.md).
 | Storage controller identification | Research | Capacity variants found; controller/media type unknown |
 
 See [Moto G60 hardware research dossier](docs/porting/hanoip-hardware-research.md).
+
+## Driver framework
+
+| Feature | Status | Notes |
+|---|---|---|
+| Host-side driver registry/matching model | Host prototype | Synthetic metadata only; no bus discovery or hardware I/O |
+| Simulated driver binding | Host prototype | Clearly labeled simulated lifecycle state |
+| Moto G60 physical driver binding | Not implemented | Exact IDs and a real kernel/platform foundation are still required |
+
+See [driver framework design](docs/architecture/driver-framework.md).
