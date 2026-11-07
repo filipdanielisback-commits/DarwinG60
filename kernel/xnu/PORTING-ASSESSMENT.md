@@ -45,3 +45,16 @@ A successful compile by itself would not prove that the kernel can run on the Mo
 **GO for source review, architecture research and a platform feasibility study.**
 
 This decision can change only when new, reliable evidence resolves the blockers above.
+
+
+## Selected upstream baseline
+
+The official Apple XNU tag `xnu-11215.1.10` is now pinned in [UPSTREAM.lock](UPSTREAM.lock) as an iOS 18-era research baseline. Its tag object is recorded there. The precise iOS point-release mapping remains to be checked against primary Apple release metadata.
+
+The upstream license text is preserved in [APPLE_LICENSE](APPLE_LICENSE). This is not a full source import.
+
+## Build result
+
+**Not built.** No compile was run, so there is no build result to report. The current repository integration environment can write GitHub files but cannot provide the matching Apple SDK/KDK environment needed to verify the upstream build. The public XNU README documents build variables and uses an internal SDK example; it does not establish a generic Linux/Android cross-build for hanoip.
+
+Next safe engineering step: review the pinned revision's documented prerequisites and source configuration, then design a reproducible host-side source validation job. Do not claim a kernel build until a real compiler run produces a recorded result.
