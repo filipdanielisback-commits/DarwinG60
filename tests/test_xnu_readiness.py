@@ -110,6 +110,22 @@ class XNUReadinessTests(unittest.TestCase):
             report = audit_xnu_readiness(root, environ={}, platform_name="Darwin")
         self.assertFalse(report["milestones"]["kernel_build_verified"])
 
+    def test_reviewed_build_record_is_read_from_audited_repository(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            make_repository(root)
+            upstream = root / "kernel" / "xnu" / "upstream"
+            upstream.mkdir()
+            record = upstream / "DARWING60-BUILD-VERIFICATION.txt"
+            record.write_text(
+                f"result=success\\ntag={EXPECTED_TAG}\\n"
+                f"tag_object={EXPECTED_TAG_OBJECT}\\nreviewed_by=test\\n",
+                encoding="utf-8",
+            )
+            report = audit_xnu_readiness(root, environ={}, platform_name="Linux")
+        self.assertTrue(report["milestones"]["kernel_build_verified"])
+        self.assertIn(str(record), report["build_verification"]["record_path"])
+
     def test_report_states_non_destructive_scope(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
