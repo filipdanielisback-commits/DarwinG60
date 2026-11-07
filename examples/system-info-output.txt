@@ -1,0 +1,19 @@
+DARWING60 SYSTEM INFO
+Mode: HOST-SIDE RESEARCH ONLY
+Device: Motorola Moto G60 (hanoip)
+SoC: Qualcomm Snapdragon 732G
+
+PROJECT IMPLEMENTATION
+Bootloader: False
+XNU port: False
+Drivers: False
+Boot image: False
+
+SIMULATED STARTUP
+1. [SIMULATED] reset
+2. [SIMULATED] firmware
+3. [SIMULATED] boot-manager
+4. [SIMULATED] kernel-handoff
+5. [SIMULATED] userspace
+
+Safety: read-only host report; no phone communication.
