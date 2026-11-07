@@ -96,18 +96,18 @@ jobs:
           print("ci_driverkit_header_export=skipped_for_generic_kernel_build")
           PY
           echo "driverkit_export=omitted_from_generic_kernel_header_export_only" >> "$evidence/kernel-build-status.txt"
-          # XNU's own README documents the exporthdrs pass before all for
-          # multi-architecture builds. Run it explicitly so generated export
-          # include trees (including libsa) exist before compilation.
-          set +e
-          make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT BUILD_LTO=0 -j2 exporthdrs > "$evidence/kernel-build.log" 2>&1
-          export_status=$?
-          echo "exporthdrs_exit_code=$export_status" >> "$evidence/kernel-build-status.txt"
-          if [ "$export_status" -eq 0 ]; then
-            make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT BUILD_LTO=0 -j2 all >> "$evidence/kernel-build.log" 2>&1
-            status=$?
+          # XNU's documented invocation runs exporthdrs and all in the
+          # same make process so the generated export tree is shared.
+          # Apple documents a matching KDK as required for external ARM64
+          # builds; do not attempt a misleading partial compile without it.
+          if [ -z "$KDK_ROOT" ]; then
+            echo "build_blocked=matching_apple_kdk_required_for_external_arm64_build" >> "$evidence/kernel-build-status.txt"
+            echo "No matching Apple KDK is installed. XNU's external Apple-silicon build instructions require the exact host-matched KDK." | tee "$evidence/kernel-build.log"
+            status=2
           else
-            status=$export_status
+            set +e
+            make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 VMAPPLE" BUILD_LTO=0 -j2 exporthdrs all > "$evidence/kernel-build.log" 2>&1
+            status=$?
           fi
           set -e
           echo "make_exit_code=$status" >> "$evidence/kernel-build-status.txt"
