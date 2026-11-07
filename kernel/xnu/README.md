@@ -53,3 +53,7 @@ A future independent DarwinG60 userspace and interface may borrow general operat
 - Apple OSS distributions: https://github.com/apple-oss-distributions
 
 Consult the license and notices for the exact upstream release before redistributing or modifying any source. This repository's top-level license applies only to original DarwinG60 contributions, not Apple's or other third-party material.
+
+## Source inventory
+
+See [UPSTREAM-SOURCES.md](UPSTREAM-SOURCES.md) for the official Apple source repositories reviewed so far, including XNU, dyld, WebKit and the iOS distribution manifest. The inventory distinguishes selected open-source components from the complete proprietary iOS 18 operating system.
