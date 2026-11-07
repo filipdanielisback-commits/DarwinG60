@@ -7,17 +7,21 @@
       "id": "display_touch",
       "name": "Display and touchscreen",
       "scope": "Panel output, display modes, touch input and gesture events.",
-      "status": "research",
+      "status": "prototype",
       "hardware": "Community device-tree summary describes IPS LCD/high refresh display; exact resolution conflicts across sources. Exact panel and touch controller unknown.",
-      "darwing60_implementation": "None",
+      "darwing60_implementation": "Host-side synthetic display/touch interface prototype only; no physical display or touch driver.",
       "evidence": [
         "S2: https://github.com/bhawesh2002/android_device_motorola_hanoip (touch configuration area; community source)",
-        "S3: https://github.com/motorola-sm6150-devs/device_motorola_hanoip"
+        "S3: https://github.com/motorola-sm6150-devs/device_motorola_hanoip",
+        "Host-side prototype: src/darwing60/display_touch.py; synthetic test fixture only."
       ],
       "tests": [],
       "gaps": [
-        "Resolve regional model and display resolution conflict.",
-        "Identify exact panel and touch-controller part numbers and interfaces."
+        "Resolve public resolution conflict: community tree says 1080x2460; TeamWin tree says 1080x2400.",
+        "Identify exact panel model/revision and DSI timings from device-specific evidence.",
+        "Identify exact touch-controller model, bus, interrupt/reset wiring and firmware requirements.",
+        "Establish source and firmware licensing/provenance before considering reuse.",
+        "No physical hardware validation or DarwinG60 kernel driver."
       ]
     },
     {
