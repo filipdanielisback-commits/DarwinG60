@@ -26,11 +26,15 @@ Some public sources disagree on display dimensions/resolution (1080 × 2460 vers
 
 ### 1. Display and touchscreen
 
-**Known:** Community device-tree summaries describe a 6.8/6.81-inch IPS LCD with high-refresh-rate support. The published community summaries conflict on the exact resolution (1080 × 2460 versus 1080 × 2400). The hanoip tree has a dedicated touch configuration area.
+**Known from device-specific archived kernel DTS:** `hanoi-panel.dtsi` includes `dsi-panel-mot-tianma-ili7807s-678-1080x2460-video.dtsi`. The panel configuration is labelled `mipi_mot_vid_tm_ili7807s_fhd_678`, declares 1080 × 2460 timing, and the hanoip overlay enables dynamic 60/120 Hz modes. This is substantially stronger evidence for the 1080 × 2460 configuration than generic spec summaries, but the DTS label is not necessarily the exact LCD module SKU or glass part number.
 
-**Unknown:** Exact LCD panel part number and revision, display bridge/controller details, DSI mode/timings, touch-controller manufacturer/model, bus address, interrupt/reset wiring, firmware requirements, and panel variation across regional batches.
+The same kernel tree's `sdmmagpie-hanoi-touchscreen.dtsi` declares a touchscreen node with `compatible = "tchip,ilitek"` on the QUPv3 SE6 SPI bus. It specifies a 12 MHz maximum SPI frequency and reset/interrupt GPIO references. The matching kernel driver source defines `DTS_OF_NAME` as `tchip,ilitek` and identifies itself as an ILITEK touch IC driver. This supports an ILITEK driver-family identification, **not an exact controller IC model**.
 
-**DarwinG60 implication:** Keep panel and touch identification as unresolved. A generic display abstraction and host-side touch-event model can be designed independently, but no physical panel or touch driver is implemented.
+**Source discrepancy:** The Android device tree's `BoardConfig.mk` separately sets the tap-to-wake sysfs path to `/sys/class/touchscreen/NVT-ts/double_click`. That NVT-labelled path does not match the ILITEK SPI node in the archived kernel DTS. These may represent different source revisions, branches, or stale configuration; do not silently choose one as definitive. Resolve against the exact regional handset/board revision before promoting the touch-controller identification.
+
+**Still unknown:** Exact LCD module SKU/revision, exact ILITEK controller part number, whether all Moto G60 revisions use the same panel/touch assembly, and the firmware/licensing requirements for the touch implementation.
+
+**DarwinG60 implication:** Record the panel configuration as a device-tree-supported lead and the touch IC family as a provisional source finding. No physical display or touch driver is implemented, and no proprietary firmware or Android code is reused.
 
 ### 2. GPU
 
@@ -131,3 +135,16 @@ Sources:
 A synthetic host-side interface prototype now exists at
 `src/darwing60/display_touch.py`. Its 800 × 600 fixture is invented test data,
 not a proposed Moto G60 mode or panel configuration.
+
+
+## Device-tree identifier follow-up (2026-11-07)
+
+A deeper review of the archived `CosmicFresh-Hanoip` kernel repository found the following device-specific files:
+
+- [`hanoi-panel.dtsi`](https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/arch/arm64/boot/dts/qcom/hanoi-panel.dtsi) includes the Tianma/ILI7807S panel definition and enables dynamic 60/120 Hz modes.
+- [`dsi-panel-mot-tianma-ili7807s-678-1080x2460-video.dtsi`](https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/arch/arm64/boot/dts/qcom/dsi-panel-mot-tianma-ili7807s-678-1080x2460-video.dtsi) declares the panel label `mipi_mot_vid_tm_ili7807s_fhd_678` and 1080 × 2460 timing. This supports the 2460-pixel height in this kernel source, but does not prove the exact retail LCD module SKU.
+- [`sdmmagpie-hanoi-touchscreen.dtsi`](https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/arch/arm64/boot/dts/qcom/sdmmagpie-hanoi-touchscreen.dtsi) declares `compatible = "tchip,ilitek"` on SPI, with reset and IRQ GPIO properties.
+- [`ilitek_v3_qcom.c`](https://github.com/Dark-Matter7232/CosmicFresh-Hanoip/blob/main/drivers/input/touchscreen/ilitek_v3_mmi/ilitek_v3_qcom.c) matches the same `tchip,ilitek` compatible string. The driver identifies the controller family as ILITEK but does not, from these declarations alone, establish the exact IC part number.
+- [`BoardConfig.mk`](https://github.com/bhawesh2002/android_device_motorola_hanoip/blob/default/BoardConfig.mk) points tap-to-wake at `/sys/class/touchscreen/NVT-ts/double_click`, which conflicts with the ILITEK SPI device-tree declaration. This discrepancy is recorded as unresolved rather than assuming either source is universally correct.
+
+The kernel repository is an archived community source, not an official Motorola hardware bill of materials. The evidence is therefore useful for source-level research but still needs correlation with the exact regional model and board revision. No kernel code, firmware, or Android blobs were copied into DarwinG60.
