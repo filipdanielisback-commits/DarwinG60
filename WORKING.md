@@ -173,3 +173,17 @@ See [Moto G60 hardware research dossier](docs/porting/hanoip-hardware-research.m
 | Moto G60 physical driver binding | Not implemented | Exact IDs and a real kernel/platform foundation are still required |
 
 See [driver framework design](docs/architecture/driver-framework.md).
+
+## Display and touch
+
+| Feature | Status | Notes |
+|---|---|---|
+| Synthetic display-mode model | Host prototype | Test metadata only; no panel output |
+| Synthetic frame sequence | Host prototype | Metadata counter only; no framebuffer or scanout |
+| Normalized multi-touch event model | Host prototype | Validates and converts synthetic events |
+| Rotation-aware coordinate conversion | Host prototype | Logical coordinates only |
+| Moto G60 panel identification | Research | Resolution conflict remains unresolved |
+| Moto G60 touch-controller identification | Research | Exact controller and interface unknown |
+| Physical display/touch driver | Not implemented | Requires verified hardware and kernel interfaces |
+
+See [display/touch prototype](docs/architecture/display-touch-prototype.md).
