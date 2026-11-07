@@ -19,7 +19,7 @@ AREAS: dict[str, tuple[str, ...]] = {
         "Adreno 618 graphics",
         "Display controller and panel initialization",
     ),
-    "wireless": ("Wi-Fi and Bluetooth", "Wi-Fi", "Bluetooth"),
+    "wireless": ("Wi-Fi and Bluetooth", "Wi-Fi", "Bluetooth", "Touchscreen, audio, Wi-Fi, Bluetooth, camera and sensors"),
     "power": ("Battery and charging", "Battery status and charging"),
     "kernel_graphics": (
         "Kernel boot",
@@ -43,7 +43,7 @@ def _match_component(
         if not isinstance(component, dict):
             continue
         name = _normalise(str(component.get("name", "")))
-        if name in wanted:
+        if name in wanted or any(alias in name or name in alias for alias in wanted):
             return component
     return None
 
