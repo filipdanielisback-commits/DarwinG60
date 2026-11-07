@@ -157,3 +157,14 @@ The exact host-matching KDK remains mandatory for the Apple-Silicon external bui
 After the ATM/refcount headers were staged, the pinned libdispatch `libfirehose_kernel` build advanced to `src/firehose/firehose_buffer.c` and failed on `<chunk_private.h>`. The exact pinned XNU source contains `libkern/firehose/chunk_private.h`. Its direct includes are `<sys/param.h>`, `firehose_types_private.h`, and `tracepoint_private.h`; the latter two are already staged beside it under the SDK's `usr/local/include/firehose` directory. The preparation script now stages this exact header from the pinned XNU submodule and verifies it is non-empty. This resolves the observed missing-file path only; the next CI run must determine whether further compile issues remain.
 
 Source: https://github.com/apple-oss-distributions/xnu/blob/8d741a5de7ff4191bf97d57b9f54c2f6d4a15585/libkern/firehose/chunk_private.h
+
+
+## Successful libfirehose dependency build; KDK remains blocking (2026-11-07)
+
+CI run [42391235120](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42391235120) completed the dependency-preparation step successfully. AvailabilityVersions produced and staged `availability.pl`. The pinned libdispatch `libfirehose_kernel` target compiled and linked a universal `libfirehose_kernel.a` containing both `arm64` and `arm64e` slices, and the script staged it into the SDK. The exact ATM/refcount and firehose chunk headers were sufficient to get past the missing-header errors observed in earlier attempts.
+
+The subsequent XNU kernel build step did **not** run. The runner inventory still found no KDK matching macOS 15.8.2 build `24H232`, so the build gate correctly stopped before invoking `make`. The workflow now selects the pinned XNU README's documented generic reference configuration `ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT`; this configuration has not yet been exercised because the KDK gate blocks it. No XNU kernel binary exists yet.
+
+The KDK is an Apple-distributed, separate download. Apple's documentation directs developers to download the KDK for the macOS version being debugged and links to the authenticated More Downloads page: https://developer.apple.com/documentation/apple-silicon/debugging-a-custom-kernel-extension and https://developer.apple.com/download/more/. The CI workflow will not use an unverified third-party mirror or store developer credentials. A matching kit must be supplied in an authorized macOS build environment and checked for its `System.kext` metadata before the kernel build can proceed.
+
+Evidence artifact from this run: [xnu-arm64-build-evidence](https://github.com/filipdanielisback-commits/DarwinG60/actions/runs/42391235120/artifacts/13581053391).
