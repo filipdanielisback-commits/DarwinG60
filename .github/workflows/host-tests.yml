@@ -21,5 +21,7 @@ jobs:
         run: python tools/device_info.py --check
       - name: Validate hardware evidence ledger
         run: python tools/check_hardware_evidence.py
+      - name: Build synthetic display/touch research profile
+        run: python tools/display_touch_profile.py
       - name: Run project checker
         run: python tools/dg60_check.py
