@@ -88,3 +88,35 @@ jobs:
           name: xnu-arm64-build-attempt
           path: kernel/xnu/build-evidence/
           if-no-files-found: warn
+      - name: Retry XNU ARM64 build with explicit Darwin 24.0.0 version override
+        working-directory: kernel/xnu/upstream
+        shell: bash
+        run: |
+          evidence="$GITHUB_WORKSPACE/kernel/xnu/build-evidence"
+          sdkroot="$(xcrun --sdk macosx --show-sdk-path)"
+          echo "SDKROOT=$sdkroot" > "$evidence/override-status.txt"
+          echo "RC_DARWIN_KERNEL_VERSION=24.0.0 (experimental build metadata override)" >> "$evidence/override-status.txt"
+          set +e
+          RC_DARWIN_KERNEL_VERSION=24.0.0 make SDKROOT="$sdkroot" ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT -j2 > "$evidence/override-build.log" 2>&1
+          status=$?
+          set -e
+          echo "make_exit_code=$status" >> "$evidence/override-status.txt"
+          artifact="$(find BUILD -type f -name 'kernel.development*' -print -quit 2>/dev/null || true)"
+          if [ -n "$artifact" ]; then
+            cp "$artifact" "$evidence/override-$(basename "$artifact")"
+            echo "artifact=$artifact" >> "$evidence/override-status.txt"
+          else
+            echo "artifact=NOT_FOUND" >> "$evidence/override-status.txt"
+          fi
+          if [ "$status" -eq 0 ] && [ -n "$artifact" ]; then
+            echo "result=success" >> "$evidence/override-status.txt"
+          else
+            echo "result=not_verified" >> "$evidence/override-status.txt"
+          fi
+      - name: Upload XNU ARM64 override build evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: xnu-arm64-override-build-attempt
+          path: kernel/xnu/build-evidence/
+          if-no-files-found: warn
