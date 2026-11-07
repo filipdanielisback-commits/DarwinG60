@@ -56,67 +56,49 @@ jobs:
           submodules: recursive
       - name: Probe macOS XNU build prerequisites
         run: python3 tools/xnu_macos_environment.py
-      - name: Attempt upstream XNU ARM64 DEVELOPMENT build
+      - name: Prepare pinned XNU source dependencies and inspect matching KDK
+        run: bash tools/xnu_prepare_dependencies.sh
+      - name: Build XNU ARM64 DEVELOPMENT kernel
         working-directory: kernel/xnu/upstream
         shell: bash
         run: |
           evidence="$GITHUB_WORKSPACE/kernel/xnu/build-evidence"
-          mkdir -p "$evidence"
-          sdkroot="$(xcrun --sdk macosx --show-sdk-path)"
-          echo "SDKROOT=$sdkroot" > "$evidence/build-status.txt"
+          if ! grep -q '^kdk_found=true$' "$evidence/dependency-prepare-status.txt"; then
+            echo "A KDK matching this runner's exact macOS version/build is required; no matching KDK was found." | tee "$evidence/kernel-build-status.txt"
+            exit 1
+          fi
+          platform="$(sysctl -n hw.target 2>/dev/null || true)"
+          if [ -z "$platform" ]; then
+            echo "Cannot identify this Apple Silicon host's TARGET_CONFIGS platform from hw.target." | tee "$evidence/kernel-build-status.txt"
+            exit 1
+          fi
+          echo "target_platform=$platform" > "$evidence/kernel-build-status.txt"
+          echo "SDKROOT=$SDKROOT" >> "$evidence/kernel-build-status.txt"
+          echo "KDKROOT=$KDK_ROOT" >> "$evidence/kernel-build-status.txt"
           set +e
-          make SDKROOT="$sdkroot" ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT -j2 > "$evidence/build.log" 2>&1
+          make SDKROOT="$SDKROOT" KDKROOT="$KDK_ROOT" RC_DARWIN_KERNEL_VERSION=24.0.0 TARGET_CONFIGS="DEVELOPMENT ARM64 $platform" BUILD_LTO=0 -j2 > "$evidence/kernel-build.log" 2>&1
           status=$?
           set -e
-          echo "make_exit_code=$status" >> "$evidence/build-status.txt"
-          artifact="$(find BUILD -type f -name 'kernel.development*' -print -quit 2>/dev/null || true)"
+          echo "make_exit_code=$status" >> "$evidence/kernel-build-status.txt"
+          artifact="$(find BUILD -type f -name 'kernel.development*' -size +0c -print -quit 2>/dev/null || true)"
           if [ -n "$artifact" ]; then
             cp "$artifact" "$evidence/$(basename "$artifact")"
-            echo "artifact=$artifact" >> "$evidence/build-status.txt"
+            shasum -a 256 "$evidence/$(basename "$artifact")" > "$evidence/kernel-artifact.sha256"
+            echo "artifact=$artifact" >> "$evidence/kernel-build-status.txt"
           else
-            echo "artifact=NOT_FOUND" >> "$evidence/build-status.txt"
+            echo "artifact=NOT_FOUND" >> "$evidence/kernel-build-status.txt"
           fi
+          shasum -a 256 "$evidence/kernel-build.log" > "$evidence/kernel-build.log.sha256"
           if [ "$status" -eq 0 ] && [ -n "$artifact" ]; then
-            echo "result=success" >> "$evidence/build-status.txt"
+            echo "result=success" >> "$evidence/kernel-build-status.txt"
           else
-            echo "result=not_verified" >> "$evidence/build-status.txt"
+            echo "result=not_verified" >> "$evidence/kernel-build-status.txt"
+            exit 1
           fi
-      - name: Upload XNU ARM64 build attempt evidence
+      - name: Upload XNU dependency and kernel build evidence
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: xnu-arm64-build-attempt
-          path: kernel/xnu/build-evidence/
-          if-no-files-found: warn
-      - name: Retry XNU ARM64 build with explicit Darwin 24.0.0 version override
-        working-directory: kernel/xnu/upstream
-        shell: bash
-        run: |
-          evidence="$GITHUB_WORKSPACE/kernel/xnu/build-evidence"
-          sdkroot="$(xcrun --sdk macosx --show-sdk-path)"
-          echo "SDKROOT=$sdkroot" > "$evidence/override-status.txt"
-          echo "RC_DARWIN_KERNEL_VERSION=24.0.0 (experimental build metadata override)" >> "$evidence/override-status.txt"
-          set +e
-          RC_DARWIN_KERNEL_VERSION=24.0.0 make SDKROOT="$sdkroot" ARCH_CONFIGS=ARM64 KERNEL_CONFIGS=DEVELOPMENT -j2 > "$evidence/override-build.log" 2>&1
-          status=$?
-          set -e
-          echo "make_exit_code=$status" >> "$evidence/override-status.txt"
-          artifact="$(find BUILD -type f -name 'kernel.development*' -print -quit 2>/dev/null || true)"
-          if [ -n "$artifact" ]; then
-            cp "$artifact" "$evidence/override-$(basename "$artifact")"
-            echo "artifact=$artifact" >> "$evidence/override-status.txt"
-          else
-            echo "artifact=NOT_FOUND" >> "$evidence/override-status.txt"
-          fi
-          if [ "$status" -eq 0 ] && [ -n "$artifact" ]; then
-            echo "result=success" >> "$evidence/override-status.txt"
-          else
-            echo "result=not_verified" >> "$evidence/override-status.txt"
-          fi
-      - name: Upload XNU ARM64 override build evidence
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: xnu-arm64-override-build-attempt
+          name: xnu-arm64-build-evidence
           path: kernel/xnu/build-evidence/
           if-no-files-found: warn
