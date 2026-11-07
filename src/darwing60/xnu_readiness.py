@@ -108,7 +108,8 @@ def audit_xnu_readiness(
     # artifacts and logs inside this repository (never inside the upstream submodule).
     build_verified = False
     build_record_errors: list[str] = []
-    if BUILD_RECORD.is_file():
+    build_record = xnu_root / "build-verification.json"
+    if build_record.is_file():
         try:
             record = json.loads(BUILD_RECORD.read_text(encoding="utf-8"))
             required_fields = (
@@ -187,7 +188,7 @@ def audit_xnu_readiness(
         },
         "build_verification": {
             "status": "verified" if build_verified else "not_verified",
-            "record_path": str(BUILD_RECORD),
+            "record_path": str(build_record),
             "errors": build_record_errors,
             "note": (
                 "A reviewed JSON record, matching pinned source, and SHA-256-verified build artifact and log are required; the audit never compiles XNU."
